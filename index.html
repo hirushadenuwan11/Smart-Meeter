@@ -3,178 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ත්‍රීවීල් ස්මාර්ට් මීටරය</title>
+    <title>SMART MEETER - Three Wheeler Fuel Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: { brand: { 500: '#10B981', 600: '#059669' } }
+                    colors: { 
+                        brand: { 500: '#00F5D4', 600: '#00BB9E' },
+                        accent: { 500: '#7209B7', 400: '#B5179E' }
+                    }
                 }
             }
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .app-glass {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .light .app-glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        .glow-effect {
+            box-shadow: 0 0 25px rgba(0, 245, 212, 0.25);
+        }
+    </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans text-base">
+<body class="bg-slate-950 light:bg-slate-50 text-slate-100 light:text-slate-900 font-sans min-h-screen selection:bg-brand-500 selection:text-slate-950 transition-colors duration-300">
 
-    <!-- LOW FUEL POPUP ALERT MODAL -->
-    <div id="low-fuel-modal" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 border-2 border-red-500 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl animate-bounce">
-            <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto text-3xl">
+    <!-- LOW FUEL POPUP MODAL -->
+    <div id="low-fuel-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="app-glass border-2 border-red-500 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl animate-bounce">
+            <div class="w-16 h-16 bg-red-500/20 text-red-500 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-inner">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <h3 class="text-xl font-extrabold text-red-500">අවවාදයයි! තෙල් අවසන්වෙමින් පවතී!</h3>
-            <p id="low-fuel-msg" class="text-sm text-slate-400 font-bold">ටැංකියේ ඉතිරිව ඇත්තේ ලීටර් 1 කටත් වඩා අඩු ප්‍රමාණයකි. කරුණාකර ඉක්මනින් තෙල් ගහගන්න!</p>
-            <button onclick="closeLowFuelModal()" class="w-full bg-red-500 hover:bg-red-600 text-white font-extrabold py-3 rounded-xl text-base transition">
+            <h3 class="text-xl font-extrabold text-red-500 tracking-wide">අවවාදයයි! තෙල් අවසන් වෙමින් පවතී!</h3>
+            <p id="low-fuel-msg" class="text-xs text-slate-300 light:text-slate-600 font-bold leading-relaxed">ටැංකියේ ඉතිරිව ඇත්තේ ලීටර් 1 කටත් වඩා අඩු ප්‍රමාණයකි!</p>
+            <button onclick="closeLowFuelModal()" class="w-full bg-gradient-to-r from-red-500 to-rose-600 text-white font-extrabold py-3.5 rounded-2xl text-sm transition transform active:scale-95 shadow-lg shadow-red-500/30">
                 තේරුණා (OK)
             </button>
         </div>
     </div>
 
     <!-- HEADER -->
-    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-4 flex justify-between items-center sticky top-0 z-40 shadow-md">
-        <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-gauge-high text-brand-500 text-2xl"></i>
-            <h1 class="text-lg font-extrabold">ත්‍රීවීල් ජීපීඑස් ප්‍රෝ</h1>
-        </div>
+    <header class="app-glass border-b border-slate-800 light:border-slate-200 px-4 py-3.5 flex justify-between items-center sticky top-0 z-40 shadow-lg">
         <div class="flex items-center space-x-3">
-            <button onclick="toggleTheme()" class="p-2.5 rounded-full bg-slate-200 dark:bg-slate-700 text-amber-500 text-sm">
-                <i id="theme-icon" class="fa-solid fa-sun"></i>
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-500 to-emerald-400 flex items-center justify-center text-slate-950 text-xl font-black shadow-lg shadow-brand-500/20">
+                <i class="fa-solid fa-gauge-high"></i>
+            </div>
+            <div>
+                <h1 class="text-base font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-cyan-400">SMART MEETER</h1>
+                <span class="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest">Three Wheeler Pro</span>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="toggleTheme()" class="w-10 h-10 rounded-2xl bg-slate-800 light:bg-slate-200 text-amber-400 flex items-center justify-center transition hover:scale-105 active:scale-95 shadow-md">
+                <i id="theme-icon" class="fa-solid fa-sun text-sm"></i>
             </button>
             <div id="user-info" class="hidden flex items-center space-x-2">
-                <span id="display-phone" class="text-xs text-slate-500 dark:text-slate-300 font-bold"></span>
-                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">
-                    ඉවත් වන්න
+                <button onclick="logout()" class="w-10 h-10 rounded-2xl bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-power-off text-sm"></i>
                 </button>
             </div>
         </div>
     </header>
 
     <!-- AUTH SECTION -->
-    <section id="auth-section" class="max-w-md mx-auto mt-16 p-6 bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 mx-4">
-        <div class="text-center mb-6">
-            <h2 id="auth-title" class="text-2xl font-extrabold text-brand-600 dark:text-brand-500">රියදුරු ලොගින් වීම</h2>
-            <p id="auth-desc" class="text-sm text-slate-500 dark:text-slate-400 mt-1">දුරකථන අංකය සහ මුරපදය ඇතුළත් කරන්න</p>
+    <section id="auth-section" class="max-w-md mx-auto mt-12 p-6 app-glass rounded-3xl shadow-2xl border border-slate-800 light:border-slate-200 mx-4 animate-fade">
+        <div class="text-center mb-6 space-y-2">
+            <div class="w-16 h-16 bg-gradient-to-tr from-brand-500/20 to-accent-500/20 text-brand-500 rounded-3xl flex items-center justify-center mx-auto text-2xl shadow-inner border border-brand-500/30">
+                <i class="fa-solid fa-key"></i>
+            </div>
+            <h2 id="auth-title" class="text-2xl font-black tracking-tight">රියදුරු ලොගින් වීම</h2>
+            <p id="auth-desc" class="text-xs text-slate-400 font-medium">දුරකථන අංකය සහ මුරපදය ඇතුළත් කරන්න</p>
         </div>
         <div class="space-y-4">
             <div>
-                <label class="block text-xs uppercase font-bold text-slate-500 dark:text-slate-400 mb-1">දුරකථන අංකය</label>
-                <input type="tel" id="auth-phone" placeholder="උදා: 0771234567" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3.5 text-base focus:outline-none focus:border-brand-500">
+                <label class="block text-[10px] uppercase font-black tracking-wider text-slate-400 mb-1.5">දුරකථන අංකය</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-brand-500 text-sm"><i class="fa-solid fa-phone"></i></span>
+                    <input type="tel" id="auth-phone" placeholder="0771234567" class="w-full bg-slate-900/60 light:bg-slate-100 border border-slate-700 light:border-slate-300 rounded-2xl py-3.5 pl-11 pr-4 text-sm focus:outline-none focus:border-brand-500 transition font-bold">
+                </div>
             </div>
             <div>
-                <label class="block text-xs uppercase font-bold text-slate-500 dark:text-slate-400 mb-1">මුරපදය</label>
-                <input type="password" id="auth-pass" placeholder="••••••••" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3.5 text-base focus:outline-none focus:border-brand-500">
+                <label class="block text-[10px] uppercase font-black tracking-wider text-slate-400 mb-1.5">මුරපදය</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-brand-500 text-sm"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" id="auth-pass" placeholder="••••••••" class="w-full bg-slate-900/60 light:bg-slate-100 border border-slate-700 light:border-slate-300 rounded-2xl py-3.5 pl-11 pr-4 text-sm focus:outline-none focus:border-brand-500 transition font-bold">
+                </div>
             </div>
-            <button onclick="handleAuth()" id="auth-btn" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold py-3.5 rounded-xl text-base transition shadow-lg">
+            <button onclick="handleAuth()" id="auth-btn" class="w-full bg-gradient-to-r from-brand-500 to-emerald-400 hover:from-brand-600 hover:to-emerald-500 text-slate-950 font-black py-4 rounded-2xl text-sm transition transform active:scale-98 shadow-lg shadow-brand-500/25">
                 <span id="auth-btn-text">ලොග් වන්න</span>
             </button>
-            <div class="text-center pt-3">
-                <button onclick="toggleMode()" id="toggle-btn" class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline">
+            <div class="text-center pt-2">
+                <button onclick="toggleMode()" id="toggle-btn" class="text-xs font-bold text-brand-500 hover:underline transition">
                     ගිණුමක් නැද්ද? ලියාපදිංචි වන්න
                 </button>
             </div>
-            <div id="auth-msg" class="text-xs text-center font-bold text-red-500"></div>
+            <div id="auth-msg" class="text-xs text-center font-bold text-red-400"></div>
         </div>
     </section>
 
     <!-- MAIN DASHBOARD -->
-    <main id="dashboard-section" class="hidden max-w-xl mx-auto p-4 space-y-6 pb-24">
+    <main id="dashboard-section" class="hidden max-w-xl mx-auto p-4 space-y-5 pb-24 animate-fade">
         
         <!-- MENU NAVIGATION BAR -->
-        <div class="grid grid-cols-4 gap-1.5 bg-white dark:bg-slate-800 p-2 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700">
-            <button onclick="switchTab('home')" id="menu-home" class="py-2.5 rounded-xl text-xs font-extrabold bg-brand-500 text-slate-950 transition flex flex-col items-center justify-center space-y-1 shadow-md">
-                <i class="fa-solid fa-house text-sm"></i>
+        <div class="grid grid-cols-4 gap-1.5 app-glass p-1.5 rounded-2xl shadow-lg border border-slate-800 light:border-slate-200">
+            <button onclick="switchTab('home')" id="menu-home" class="py-2.5 rounded-xl text-xs font-black bg-brand-500 text-slate-950 transition-all flex flex-col items-center justify-center space-y-1 shadow-lg shadow-brand-500/30">
+                <i class="fa-solid fa-gauge text-sm"></i>
                 <span>මීටරය</span>
             </button>
-            <button onclick="switchTab('refuel')" id="menu-refuel" class="py-2.5 rounded-xl text-xs font-extrabold text-slate-600 dark:text-slate-300 transition flex flex-col items-center justify-center space-y-1">
+            <button onclick="switchTab('refuel')" id="menu-refuel" class="py-2.5 rounded-xl text-xs font-black text-slate-400 hover:text-slate-100 transition-all flex flex-col items-center justify-center space-y-1">
                 <i class="fa-solid fa-gas-pump text-sm"></i>
-                <span>තෙල් ගැසීම</span>
+                <span>තෙල්</span>
             </button>
-            <button onclick="switchTab('maintenance')" id="menu-maintenance" class="py-2.5 rounded-xl text-xs font-extrabold text-slate-600 dark:text-slate-300 transition flex flex-col items-center justify-center space-y-1">
-                <i class="fa-solid fa-screwdriver-wrench text-sm"></i>
-                <span>නඩත්තුව</span>
+            <button onclick="switchTab('maintenance')" id="menu-maintenance" class="py-2.5 rounded-xl text-xs font-black text-slate-400 hover:text-slate-100 transition-all flex flex-col items-center justify-center space-y-1">
+                <i class="fa-solid fa-wrench text-sm"></i>
+                <span>නඩත්තු</span>
             </button>
-            <button onclick="switchTab('history')" id="menu-history" class="py-2.5 rounded-xl text-xs font-extrabold text-slate-600 dark:text-slate-300 transition flex flex-col items-center justify-center space-y-1">
+            <button onclick="switchTab('history')" id="menu-history" class="py-2.5 rounded-xl text-xs font-black text-slate-400 hover:text-slate-100 transition-all flex flex-col items-center justify-center space-y-1">
                 <i class="fa-solid fa-clock-rotate-left text-sm"></i>
                 <span>ඉතිහාසය</span>
             </button>
         </div>
 
         <!-- TAB 1: HOME PAGE -->
-        <div id="tab-home" class="tab-content space-y-5">
+        <div id="tab-home" class="tab-content space-y-4">
             
             <!-- TANK STATUS & SETTINGS -->
-            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-5 shadow-md space-y-4">
-                <h3 class="text-base font-extrabold text-brand-600 dark:text-brand-400">🛺 වාහන තත්ත්වය සහ සැකසුම්</h3>
+            <div class="app-glass rounded-3xl p-5 shadow-xl space-y-4 border border-slate-800 light:border-slate-200">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-brand-500 flex items-center space-x-2">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>වාහන සැකසුම් සහ තත්ත්වය</span>
+                    </h3>
+                    <span id="display-phone" class="text-[11px] font-extrabold px-3 py-1 rounded-xl bg-slate-800 light:bg-slate-200 text-brand-400"></span>
+                </div>
 
-                <div class="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+                <div class="grid grid-cols-2 gap-3 bg-slate-950/40 light:bg-slate-100 p-3 rounded-2xl border border-slate-800 light:border-slate-200">
                     <div>
-                        <label class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">මයිලේජ් (KM/L)</label>
-                        <input type="number" id="input-mileage" value="30" onchange="updateSettings()" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-2 text-sm font-extrabold text-amber-500 text-center">
+                        <label class="text-[9px] uppercase font-black text-slate-400 block mb-1">මයිලේජ් (KM/L)</label>
+                        <input type="number" id="input-mileage" value="30" onchange="updateSettings()" class="w-full bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 rounded-xl p-2 text-sm font-black text-amber-400 text-center focus:outline-none focus:border-brand-500">
                     </div>
                     <div>
-                        <label class="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 block mb-1">ටැංකි ධාරිතාව (L)</label>
-                        <input type="number" id="input-tank" value="8" onchange="updateSettings()" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-2 text-sm font-extrabold text-blue-500 text-center">
+                        <label class="text-[9px] uppercase font-black text-slate-400 block mb-1">ටැංකි ධාරිතාව (L)</label>
+                        <input type="number" id="input-tank" value="8" onchange="updateSettings()" class="w-full bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 rounded-xl p-2 text-sm font-black text-cyan-400 text-center focus:outline-none focus:border-brand-500">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 text-center">
-                    <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
-                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">ඉතුරු තෙල් ප්‍රමාණය</span>
-                        <!-- Total Fuel Color changes to Red if <= 1L -->
-                        <span id="stat-fuel" class="text-2xl font-extrabold text-brand-600 dark:text-brand-400">0.0 L</span>
+                    <div class="bg-slate-950/40 light:bg-slate-100 p-4 rounded-2xl border border-slate-800 light:border-slate-200">
+                        <span class="text-[10px] font-black uppercase text-slate-400 block mb-1">ඉතුරු තෙල් ප්‍රමාණය</span>
+                        <span id="stat-fuel" class="text-2xl font-black text-brand-500 transition-all">0.0 L</span>
                     </div>
-                    <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
-                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">යන්න පුළුවන් දුර</span>
-                        <span id="stat-range" class="text-2xl font-extrabold text-blue-500">0 KM</span>
+                    <div class="bg-slate-950/40 light:bg-slate-100 p-4 rounded-2xl border border-slate-800 light:border-slate-200">
+                        <span class="text-[10px] font-black uppercase text-slate-400 block mb-1">යන්න පුළුවන් දුර</span>
+                        <span id="stat-range" class="text-2xl font-black text-cyan-400">0 KM</span>
                     </div>
                 </div>
 
-                <div class="w-full bg-slate-200 dark:bg-slate-900 rounded-full h-3 overflow-hidden">
-                    <div id="fuel-bar" class="bg-brand-500 h-full transition-all duration-300" style="width: 0%"></div>
+                <div class="w-full bg-slate-900 light:bg-slate-200 rounded-full h-3.5 overflow-hidden p-0.5 border border-slate-800 light:border-slate-300">
+                    <div id="fuel-bar" class="bg-gradient-to-r from-brand-500 to-cyan-400 h-full rounded-full transition-all duration-500 shadow-md shadow-brand-500/50" style="width: 0%"></div>
                 </div>
             </div>
 
             <!-- MONTHLY SUMMARY -->
-            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-5 shadow-md space-y-3">
-                <h3 class="text-base font-extrabold text-amber-500 flex items-center space-x-2">
-                    <i class="fa-solid fa-calendar-days"></i>
-                    <span>මේ මස වියදම් සාරාංශය (Monthly Summary)</span>
+            <div class="app-glass rounded-3xl p-5 shadow-xl space-y-3 border border-slate-800 light:border-slate-200">
+                <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center space-x-2">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>මේ මස සාරාංශය</span>
                 </h3>
                 <div class="grid grid-cols-2 gap-3 text-center">
-                    <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-700">
-                        <span class="text-xs font-bold text-slate-400 block mb-1">මුළු වියදම</span>
-                        <span id="monthly-cost" class="text-lg font-extrabold text-amber-400">LKR 0</span>
+                    <div class="bg-slate-950/40 light:bg-slate-100 p-3.5 rounded-2xl border border-slate-800 light:border-slate-200">
+                        <span class="text-[9px] font-black uppercase text-slate-400 block mb-1">මුළු වියදම</span>
+                        <span id="monthly-cost" class="text-base font-black text-amber-400">LKR 0</span>
                     </div>
-                    <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-700">
-                        <span class="text-xs font-bold text-slate-400 block mb-1">ගැසූ මුළු තෙල්</span>
-                        <span id="monthly-liters" class="text-lg font-extrabold text-brand-400">0.0 L</span>
+                    <div class="bg-slate-950/40 light:bg-slate-100 p-3.5 rounded-2xl border border-slate-800 light:border-slate-200">
+                        <span class="text-[9px] font-black uppercase text-slate-400 block mb-1">ගැසූ මුළු තෙල්</span>
+                        <span id="monthly-liters" class="text-base font-black text-brand-500">0.0 L</span>
                     </div>
                 </div>
             </div>
 
             <!-- LIVE GPS TRIP CONTROLS -->
-            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 shadow-md space-y-4 text-center">
-                <h3 class="text-lg font-extrabold text-blue-500 flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-satellite-dish"></i>
-                    <span>සජීවී ජීපීඑස් ගමන් මීටරය (Live GPS Trip)</span>
-                </h3>
-                <p class="text-xs text-slate-400">ගමන අරඹන විට "Start Trip" ඔබන්න. ඔබ යද්දී දුර ස්වයංක්‍රීයව මැනේ.</p>
+            <div class="app-glass rounded-3xl p-6 shadow-xl space-y-4 text-center border border-slate-800 light:border-slate-200 glow-effect">
+                <div class="w-14 h-14 bg-cyan-500/10 text-cyan-400 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner border border-cyan-500/20">
+                    <i class="fa-solid fa-satellite-dish animate-pulse"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-cyan-400">සජීවී ජීපීඑස් මීටරය</h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">ගමන අරඹන විට Start Trip ඔබන්න</p>
+                </div>
 
-                <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
-                    <span class="text-xs font-bold text-slate-400 block mb-1">ගමන් කළ දුර (Live KM)</span>
-                    <span id="live-km-val" class="text-3xl font-extrabold text-white">0.00 KM</span>
+                <div class="bg-slate-950/50 light:bg-slate-100 p-4 rounded-2xl border border-slate-800 light:border-slate-200">
+                    <span class="text-[10px] font-black text-slate-400 block mb-1 uppercase tracking-widest">ගමන් කළ දුර (Live KM)</span>
+                    <span id="live-km-val" class="text-3xl font-black text-white light:text-slate-900 tracking-tight">0.00 KM</span>
                     <div id="trip-status-text" class="text-xs font-bold text-brand-500 mt-2">සූදානම් තත්වයේ ඇත</div>
                 </div>
 
-                <button id="start-trip-btn" onclick="startLiveTrip()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-4 rounded-2xl text-base transition shadow-lg">
-                    <i class="fa-solid fa-play mr-2"></i> ගමන ආරම්භ කරන්න (Start Trip)
+                <button id="start-trip-btn" onclick="startLiveTrip()" class="w-full bg-gradient-to-r from-emerald-500 to-brand-500 hover:from-emerald-600 hover:to-brand-600 text-slate-950 font-black py-4 rounded-2xl text-base transition transform active:scale-98 shadow-lg shadow-brand-500/30 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-play"></i>
+                    <span>ගමන ආරම්භ කරන්න (Start Trip)</span>
                 </button>
 
-                <button id="end-trip-btn" onclick="endLiveTrip()" class="hidden w-full bg-red-600 hover:bg-red-700 text-white font-extrabold py-4 rounded-2xl text-base transition shadow-lg animate-pulse">
-                    <i class="fa-solid fa-stop mr-2"></i> ගමන අවසන් කරන්න (End Trip & Deduct Fuel)
+                <button id="end-trip-btn" onclick="endLiveTrip()" class="hidden w-full bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-black py-4 rounded-2xl text-base transition transform active:scale-98 shadow-lg shadow-red-500/30 animate-pulse flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-stop"></i>
+                    <span>ගමන අවසන් කරන්න (End Trip)</span>
                 </button>
             </div>
 
@@ -182,21 +229,21 @@
 
         <!-- TAB 2: REFUEL INPUT -->
         <div id="tab-refuel" class="tab-content hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 shadow-md space-y-4">
-                <h3 class="text-lg font-extrabold flex items-center space-x-2 text-brand-600 dark:text-brand-400">
+            <div class="app-glass rounded-3xl p-6 shadow-xl space-y-4 border border-slate-800 light:border-slate-200">
+                <h3 class="text-sm font-black uppercase tracking-wider flex items-center space-x-2 text-brand-500">
                     <i class="fa-solid fa-gas-pump"></i>
                     <span>තෙල් ගැසීමක් ඇතුළත් කරන්න</span>
                 </h3>
-                <div class="space-y-3">
+                <div class="space-y-3.5">
                     <div>
-                        <label class="block text-xs uppercase font-bold text-slate-500 dark:text-slate-400 mb-1">පෙට්‍රල් ලීටර් ගණන</label>
-                        <input type="number" id="refuel-liters" step="0.1" placeholder="උදා: 3.5" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3.5 text-base">
+                        <label class="block text-[10px] uppercase font-black text-slate-400 mb-1.5">පෙට්‍රල් ලීටර් ගණන</label>
+                        <input type="number" id="refuel-liters" step="0.1" placeholder="උදා: 3.5" class="w-full bg-slate-900 light:bg-slate-100 border border-slate-700 light:border-slate-300 rounded-2xl p-3.5 text-sm font-black focus:outline-none focus:border-brand-500">
                     </div>
                     <div>
-                        <label class="block text-xs uppercase font-bold text-slate-500 dark:text-slate-400 mb-1">ගෙවූ මුදල (LKR)</label>
-                        <input type="number" id="refuel-cost" placeholder="උදා: 1200" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3.5 text-base">
+                        <label class="block text-[10px] uppercase font-black text-slate-400 mb-1.5">ගෙවූ මුදල (LKR)</label>
+                        <input type="number" id="refuel-cost" placeholder="උදා: 1200" class="w-full bg-slate-900 light:bg-slate-100 border border-slate-700 light:border-slate-300 rounded-2xl p-3.5 text-sm font-black focus:outline-none focus:border-brand-500">
                     </div>
-                    <button onclick="submitRefuel()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold py-3.5 rounded-xl text-base transition shadow-md">
+                    <button onclick="submitRefuel()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-black py-4 rounded-2xl text-sm transition transform active:scale-98 shadow-lg shadow-brand-500/25">
                         ටොටල් ලීටර් වලට එකතු කරන්න
                     </button>
                 </div>
@@ -205,21 +252,21 @@
 
         <!-- TAB 3: MAINTENANCE -->
         <div id="tab-maintenance" class="tab-content hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 shadow-md space-y-4">
-                <h3 class="text-lg font-extrabold flex items-center space-x-2 text-purple-400">
-                    <i class="fa-solid fa-screwdriver-wrench"></i>
-                    <span>සේවා සහ නඩත්තු මතක් කිරීම් (Maintenance)</span>
+            <div class="app-glass rounded-3xl p-6 shadow-xl space-y-4 border border-slate-800 light:border-slate-200">
+                <h3 class="text-sm font-black uppercase tracking-wider flex items-center space-x-2 text-accent-400">
+                    <i class="fa-solid fa-wrench"></i>
+                    <span>සේවා සහ නඩත්තු මතක් කිරීම්</span>
                 </h3>
-                <div class="space-y-3">
+                <div class="space-y-3.5">
                     <div>
-                        <label class="block text-xs uppercase font-bold text-slate-500 dark:text-slate-400 mb-1">නඩත්තු විස්තරය</label>
-                        <input type="text" id="maint-desc" placeholder="උදා: Engine Oil Change" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm">
+                        <label class="block text-[10px] uppercase font-black text-slate-400 mb-1.5">නඩත්තු විස්තරය</label>
+                        <input type="text" id="maint-desc" placeholder="උදා: Engine Oil Change" class="w-full bg-slate-900 light:bg-slate-100 border border-slate-700 light:border-slate-300 rounded-2xl p-3.5 text-sm font-black focus:outline-none focus:border-accent-400">
                     </div>
                     <div>
-                        <label class="block text-xs uppercase font-bold text-slate-500 dark:text-slate-400 mb-1">වියදම (LKR)</label>
-                        <input type="number" id="maint-cost" placeholder="උදා: 2500" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm">
+                        <label class="block text-[10px] uppercase font-black text-slate-400 mb-1.5">වියදම (LKR)</label>
+                        <input type="number" id="maint-cost" placeholder="උදා: 2500" class="w-full bg-slate-900 light:bg-slate-100 border border-slate-700 light:border-slate-300 rounded-2xl p-3.5 text-sm font-black focus:outline-none focus:border-accent-400">
                     </div>
-                    <button onclick="addMaintenance()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-extrabold py-3.5 rounded-xl text-sm transition shadow-md">
+                    <button onclick="addMaintenance()" class="w-full bg-gradient-to-r from-accent-500 to-accent-400 hover:opacity-90 text-white font-black py-4 rounded-2xl text-sm transition transform active:scale-98 shadow-lg shadow-accent-500/25">
                         නඩත්තු සටහන තබා ගන්න
                     </button>
                 </div>
@@ -228,27 +275,28 @@
 
         <!-- TAB 4: HISTORY -->
         <div id="tab-history" class="tab-content hidden space-y-4">
-            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 shadow-md space-y-4">
+            <div class="app-glass rounded-3xl p-6 shadow-xl space-y-4 border border-slate-800 light:border-slate-200">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-extrabold flex items-center space-x-2 text-amber-500">
+                    <h3 class="text-sm font-black uppercase tracking-wider flex items-center space-x-2 text-amber-400">
                         <i class="fa-solid fa-clock-rotate-left"></i>
                         <span>ඉතිහාසය සහ CSV</span>
                     </h3>
-                    <button onclick="exportToCSV()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-xl shadow">
-                        <i class="fa-solid fa-download mr-1"></i> CSV Export
+                    <button onclick="exportToCSV()" class="bg-cyan-500 hover:bg-cyan-600 text-slate-950 text-xs font-black px-3.5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Export CSV</span>
                     </button>
                 </div>
-                <div class="overflow-x-auto max-h-80">
+                <div class="overflow-x-auto max-h-80 rounded-2xl border border-slate-800 light:border-slate-200">
                     <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="border-b border-slate-200 dark:border-slate-700 text-slate-500">
-                                <th class="p-2.5">දිනය / විස්තරය</th>
-                                <th class="p-2.5">ලීටර්</th>
-                                <th class="p-2.5">මුදල</th>
+                        <thead class="bg-slate-900/80 light:bg-slate-200 text-slate-400 text-[10px] uppercase font-black">
+                            <tr>
+                                <th class="p-3">දිනය / විස්තරය</th>
+                                <th class="p-3">ලීටර්</th>
+                                <th class="p-3">මුදල</th>
                             </tr>
                         </thead>
-                        <tbody id="history-tbody">
-                            <tr><td colspan="3" class="p-4 text-center text-slate-400 font-bold">වාර්තා හමු නොවීය.</td></tr>
+                        <tbody id="history-tbody" class="divide-y divide-slate-800/50 light:divide-slate-200">
+                            <tr><td colspan="3" class="p-4 text-center text-slate-400 font-bold text-xs">වාර්තා හමු නොවීය.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -258,7 +306,7 @@
     </main>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjMt6fvBAfQ-zOy3YkJvB1WzurDuQVliTjhpx83Th0wtTjKPzQWW4E2A0Ugs3a0eRt/exec";
+        const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
 
         let isRegisterState = false;
         let currentPhone = "";
@@ -276,7 +324,8 @@
             const html = document.documentElement;
             const icon = document.getElementById('theme-icon');
             html.classList.toggle('dark');
-            icon.className = html.classList.contains('dark') ? "fa-solid fa-sun" : "fa-solid fa-moon";
+            html.classList.toggle('light');
+            icon.className = html.classList.contains('dark') ? "fa-solid fa-sun text-sm" : "fa-solid fa-moon text-sm";
         }
 
         function switchTab(tabName) {
@@ -286,9 +335,9 @@
             ['home', 'refuel', 'maintenance', 'history'].forEach(name => {
                 const btn = document.getElementById(`menu-${name}`);
                 if(name === tabName) {
-                    btn.className = "py-2.5 rounded-xl text-xs font-extrabold bg-brand-500 text-slate-950 transition flex flex-col items-center justify-center space-y-1 shadow-md";
+                    btn.className = "py-2.5 rounded-xl text-xs font-black bg-brand-500 text-slate-950 transition-all flex flex-col items-center justify-center space-y-1 shadow-lg shadow-brand-500/30";
                 } else {
-                    btn.className = "py-2.5 rounded-xl text-xs font-extrabold text-slate-600 dark:text-slate-300 transition flex flex-col items-center justify-center space-y-1";
+                    btn.className = "py-2.5 rounded-xl text-xs font-black text-slate-400 hover:text-slate-100 transition-all flex flex-col items-center justify-center space-y-1";
                 }
             });
         }
@@ -407,7 +456,7 @@
 
             currentFuel = Math.min(tankCapacity, currentFuel + liters);
             if(currentFuel > 1.0) {
-                alertShownForThisLowFuel = false; // Reset alert flag when refueled
+                alertShownForThisLowFuel = false;
             }
             const dateStr = new Date().toLocaleString();
             
@@ -465,7 +514,7 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `three_wheeler_history_${currentPhone}.csv`);
+            link.setAttribute("download", `smart_meeter_history_${currentPhone}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -507,7 +556,6 @@
                             totalTripKM += dist;
                             document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
                             
-                            // Real-time fuel deduction preview check
                             const fuelNeeded = totalTripKM / mileage;
                             let tempFuel = Math.max(0, currentFuel - fuelNeeded);
                             if (tempFuel <= 1.0 && !alertShownForThisLowFuel) {
@@ -577,14 +625,13 @@
             const fuelStatEl = document.getElementById('stat-fuel');
             fuelStatEl.innerText = `${currentFuel.toFixed(1)} L`;
 
-            // Check if fuel is 1L or less -> Turn text RED and trigger popup alert if not shown
             if (currentFuel <= 1.0) {
-                fuelStatEl.className = "text-2xl font-extrabold text-red-500 animate-pulse";
+                fuelStatEl.className = "text-2xl font-black text-red-500 animate-pulse";
                 if (!alertShownForThisLowFuel && currentFuel > 0) {
                     showLowFuelModal(currentFuel);
                 }
             } else {
-                fuelStatEl.className = "text-2xl font-extrabold text-brand-600 dark:text-brand-400";
+                fuelStatEl.className = "text-2xl font-black text-brand-500";
             }
 
             const range = currentFuel * mileage;
@@ -606,13 +653,13 @@
 
             const tbody = document.getElementById('history-tbody');
             if(historyData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400 font-bold">වාර්තා හමු නොවීය.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400 font-bold text-xs">වාර්තා හමු නොවීය.</td></tr>`;
             } else {
                 tbody.innerHTML = historyData.slice().reverse().map(item => `
-                    <tr class="border-b border-slate-100 dark:border-slate-700/50">
-                        <td class="p-3 font-semibold">${item.date}</td>
-                        <td class="p-3 ${item.liters > 0 ? 'text-brand-500' : 'text-red-500'} font-extrabold">${item.liters > 0 ? '+' : ''}${item.liters} L</td>
-                        <td class="p-3 font-bold">${item.cost > 0 ? 'LKR ' + item.cost : '-'}</td>
+                    <tr class="hover:bg-slate-900/40 light:hover:bg-slate-100 transition">
+                        <td class="p-3 font-bold text-xs">${item.date}</td>
+                        <td class="p-3 ${item.liters > 0 ? 'text-brand-500' : 'text-red-400'} font-black text-xs">${item.liters > 0 ? '+' : ''}${item.liters} L</td>
+                        <td class="p-3 font-bold text-xs">${item.cost > 0 ? 'LKR ' + item.cost : '-'}</td>
                     </tr>
                 `).join('');
             }
