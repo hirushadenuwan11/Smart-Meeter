@@ -856,7 +856,7 @@
                         const distKM = calculateDistance(lastPosition.lat, lastPosition.lng, currentCoords.lat, currentCoords.lng);
                         
                         // 🛑 GPS DRIFT FILTER: මීටර් 4කට (0.004 KM) වඩා අඩු චලනයන් නොසලකා හැරීම
-                        if (distKM > 0.004) {
+                        if (distKM > 0.02) {
                             totalTripKM += distKM;
                             document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
                             
