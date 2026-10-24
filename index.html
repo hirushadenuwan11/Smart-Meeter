@@ -830,18 +830,22 @@
             document.body.removeChild(link);
         }
 
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * (Math.PI / 180);
-            const dLon = (lon2 - lon1) * (Math.PI / 180);
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        function calculateDistanceInMeters(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // metres
+            const φ1 = lat1 * Math.PI/180;
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lon2-lon1) * Math.PI/180;
+
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            return R * c; // returns distance in meters
         }
 
-        // SMART FILTER & WAKE LOCK GPS TRIP START
-        // SMART FILTER & WAKE LOCK GPS TRIP START (Fixed for Android & Fake Location)
+       // SMART FILTER & WAKE LOCK GPS TRIP START (Android & Fake Location Fixed)
         async function startLiveTrip() {
             if (!navigator.geolocation) { alert("GPS සඳහා සහය නොදක්වයි!"); return; }
 
@@ -863,41 +867,35 @@
                 (position) => {
                     const currentCoords = { 
                         lat: position.coords.latitude, 
-                        lng: position.coords.longitude,
-                        accuracy: position.coords.accuracy, 
-                        speed: position.coords.speed        
+                        lng: position.coords.longitude
                     };
                     
-                    // ඇන්ඩ්‍රොයිඩ් සහ ෆේක් ලොකේෂන් සඳහා Accuracy සීමාව මඳක් ලිහිල් කළෙමු (මීටර් 100 දක්වා)
-                    if (currentCoords.accuracy > 100) {
-                        return; 
+                    if (!lastPosition) {
+                        lastPosition = currentCoords;
+                        return;
                     }
 
-                    if (lastPosition) {
-                        const distKM = calculateDistance(lastPosition.lat, lastPosition.lng, currentCoords.lat, currentCoords.lng);
+                    // මීටර් වලින් දුර ගණනය කිරීම
+                    const distMeters = calculateDistanceInMeters(lastPosition.lat, lastPosition.lng, currentCoords.lat, currentCoords.lng);
+                    
+                    // මීටර් 1ක් හෝ ඊට වැඩි වෙනස් වීමක් වුවහොත් මීටරය ඉස්සරහට යයි (Fake Location සහ Real GPS වලට දෙකටම වැඩ කරයි)
+                    if (distMeters >= 1.0 && distMeters < 5000) { 
+                        const distKM = distMeters / 1000;
+                        totalTripKM += distKM;
+                        document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
                         
-                        // GPS පැනීම් (Jumps) වැළැක්වීම: එකවර කි.මී. 2කට වඩා වැඩි පිම්මක් පැනේ නම් එය මඟහරියි
-                        if (distKM > 2.0) {
-                            return; 
-                        }
-
-                        // අවම දුර සීමාව: මීටර් 2.5ක් (0.0025 KM) හෝ ከዚያ වැඩි දුරක් චලනය වුවහොත් මීටරය ඉදිරියට යයි
-                        if (distKM >= 0.0025) {
-                            totalTripKM += distKM;
-                            document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
-                            
-                            const fuelNeeded = totalTripKM / mileage;
-                            let tempFuel = Math.max(0, currentFuel - fuelNeeded);
-                            if (tempFuel <= 1.0 && !alertShownForThisLowFuel) showLowFuelModal(tempFuel);
-                            
-                            lastPosition = currentCoords;
-                        }
-                    } else {
+                        const fuelNeeded = totalTripKM / mileage;
+                        let tempFuel = Math.max(0, currentFuel - fuelNeeded);
+                        if (tempFuel <= 1.0 && !alertShownForThisLowFuel) showLowFuelModal(tempFuel);
+                        
                         lastPosition = currentCoords;
                     }
                 },
-                (error) => { console.log("GPS සංඥා අපේක්ෂා කරයි...", error); },
-                { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+                (error) => { 
+                    console.log("GPS Error:", error.message);
+                    document.getElementById('trip-status-text').innerText = "GPS දෝෂයක්: " + error.message;
+                },
+                { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
             );
         }
 
@@ -919,7 +917,7 @@
             document.getElementById('start-trip-btn').classList.remove('hidden');
             document.getElementById('end-trip-btn').classList.add('hidden');
 
-            if (totalTripKM < 0.1) {
+            if (totalTripKM < 0.01) {
                 alert("ගමන් කළ දුර ඉතාම අඩුය!");
                 document.getElementById('trip-status-text').innerText = "සූදානම් තත්වයේ ඇත";
                 document.getElementById('live-km-val').innerText = `0.00 KM`;
