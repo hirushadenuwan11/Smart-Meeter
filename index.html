@@ -425,6 +425,7 @@
         let serviceLimit = 1000;
 
         let watchId = null;
+        let wakeLock = null;
         let totalTripKM = 0;
         let lastPosition = null;
         let alertShownForThisLowFuel = false;
@@ -839,14 +840,25 @@
             return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
-        function startLiveTrip() {
+      async function startLiveTrip() {
     if (!navigator.geolocation) { alert("GPS සඳහා සහය නොදක්වයි!"); return; }
+
+    // 🌟 ස්ක්‍රීන් එක ඕෆ් වීම වැළැක්වීම (Wake Lock Request)
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+        }
+    } catch (err) {
+        console.log(err);
+    }
 
     totalTripKM = 0;
     lastPosition = null;
     document.getElementById('trip-status-text').innerText = "ගමන යමින් පවතී... (GPS ක්‍රියාත්මකයි)";
     document.getElementById('start-trip-btn').classList.add('hidden');
     document.getElementById('end-trip-btn').classList.remove('hidden');
+
+    // ... ඉතිරි ජීපීඑස් කෝඩ් කොටස මෙහි ඇත ...
 
     watchId = navigator.geolocation.watchPosition(
         (position) => {
@@ -896,12 +908,19 @@
         { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
     );
 }
+     async function endLiveTrip() {
+         if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
 
-        async function endLiveTrip() {
-            if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+        // 🌟 ස්ක්‍රීන් ලොක් එක නිදහස් කිරීම
+        if (wakeLock !== null) {
+        await wakeLock.release();
+        wakeLock = null;
+    }
 
-            document.getElementById('start-trip-btn').classList.remove('hidden');
-            document.getElementById('end-trip-btn').classList.add('hidden');
+    document.getElementById('start-trip-btn').classList.remove('hidden');
+    document.getElementById('end-trip-btn').classList.add('hidden');
+    
+    // ... ඉතිරි කෝඩ් කොටස මෙහි ඇත ...
 
             if (totalTripKM < 0.1) {
                 alert("ගමන් කළ දුර ඉතාම අඩුය!");
