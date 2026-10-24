@@ -212,6 +212,28 @@
                 </div>
             </div>
 
+            <!-- NEXT SERVICE / OIL CHANGE TRACKER PANEL -->
+            <div class="app-glass rounded-3xl p-5 shadow-xl space-y-3 border border-slate-800 light:border-slate-200">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center space-x-2">
+                        <i class="fa-solid fa-oil-can"></i>
+                        <span>ඊළඟ ඔයිල් මාරුවට (Next Service) ඉතිරි දුර</span>
+                    </h3>
+                    <button onclick="resetServiceCounter()" class="bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-950 text-[10px] font-black px-2.5 py-1 rounded-xl transition">
+                        Reset
+                    </button>
+                </div>
+                <div class="bg-slate-950/50 light:bg-slate-100 p-3.5 rounded-2xl border border-slate-800 light:border-slate-200 flex justify-between items-center shadow-inner">
+                    <div>
+                        <span id="service-remaining-km" class="text-2xl font-black text-amber-400">1000 KM</span>
+                        <span class="text-[10px] text-slate-400 block font-bold">සීමාව: <span id="service-limit-display">1000</span> KM ට වතාවක්</span>
+                    </div>
+                    <button onclick="changeServiceLimit()" class="bg-slate-900 light:bg-white text-slate-300 light:text-slate-700 text-xs font-black px-3 py-2 rounded-xl border border-slate-700 light:border-slate-300 shadow-sm">
+                        සීමාව වෙනස් කරන්න
+                    </button>
+                </div>
+            </div>
+
             <!-- MANUAL KM CALCULATOR -->
             <div class="app-glass rounded-3xl p-5 shadow-xl space-y-3.5 border border-slate-800 light:border-slate-200">
                 <h3 class="text-xs font-black uppercase tracking-wider text-purple-400 flex items-center space-x-2">
@@ -311,7 +333,6 @@
                 </h3>
                 
                 <div class="space-y-4">
-                    <!-- Emission Test -->
                     <div class="bg-slate-950/50 light:bg-slate-100 p-4 rounded-2xl border border-slate-800 light:border-slate-200 space-y-2">
                         <div class="flex justify-between items-center">
                             <span class="text-xs font-black text-amber-400"><i class="fa-solid fa-smog mr-1.5"></i> දුම් සහතිකය (Emission Test)</span>
@@ -320,7 +341,6 @@
                         <input type="date" id="date-emission" onchange="saveDocumentDates()" class="w-full bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 rounded-xl p-3 text-xs font-black text-cyan-400 focus:outline-none">
                     </div>
 
-                    <!-- Insurance -->
                     <div class="bg-slate-950/50 light:bg-slate-100 p-4 rounded-2xl border border-slate-800 light:border-slate-200 space-y-2">
                         <div class="flex justify-between items-center">
                             <span class="text-xs font-black text-amber-400"><i class="fa-solid fa-shield-heart mr-1.5"></i> රක්ෂණය (Insurance)</span>
@@ -329,7 +349,6 @@
                         <input type="date" id="date-insurance" onchange="saveDocumentDates()" class="w-full bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 rounded-xl p-3 text-xs font-black text-cyan-400 focus:outline-none">
                     </div>
 
-                    <!-- Revenue License -->
                     <div class="bg-slate-950/50 light:bg-slate-100 p-4 rounded-2xl border border-slate-800 light:border-slate-200 space-y-2">
                         <div class="flex justify-between items-center">
                             <span class="text-xs font-black text-amber-400"><i class="fa-solid fa-id-card mr-1.5"></i> ආදායම් බලපත්‍රය (Revenue License)</span>
@@ -382,6 +401,8 @@
         let mileage = 30;
         let currentFuel = 0.0;
         let historyData = [];
+        let totalDrivenKM = 0;
+        let serviceLimit = 1000;
 
         let watchId = null;
         let totalTripKM = 0;
@@ -490,6 +511,8 @@
         function saveOfflineData() {
             if(currentPhone) {
                 localStorage.setItem(`history_${currentPhone}`, JSON.stringify(historyData));
+                localStorage.setItem(`drivenKM_${currentPhone}`, totalDrivenKM);
+                localStorage.setItem(`serviceLimit_${currentPhone}`, serviceLimit);
             }
         }
 
@@ -515,6 +538,12 @@
                 const savedTank = localStorage.getItem(`tank_${currentPhone}`);
                 tankCapacity = savedTank ? parseFloat(savedTank) : 8;
                 document.getElementById('input-tank').value = tankCapacity;
+
+                const savedDriven = localStorage.getItem(`drivenKM_${currentPhone}`);
+                totalDrivenKM = savedDriven ? parseFloat(savedDriven) : 0;
+
+                const savedLimit = localStorage.getItem(`serviceLimit_${currentPhone}`);
+                serviceLimit = savedLimit ? parseFloat(savedLimit) : 1000;
 
                 const emission = localStorage.getItem(`doc_emission_${currentPhone}`);
                 if(emission) document.getElementById('date-emission').value = emission;
@@ -584,6 +613,24 @@
             document.getElementById('warning-modal').classList.add('hidden');
         }
 
+        function resetServiceCounter() {
+            if(confirm('ඔබ ඔයිල් මාරු කිරීම සිදුකළ බවට Reset කිරීමට අවශ්‍යද?')) {
+                totalDrivenKM = 0;
+                saveOfflineData();
+                updateUI();
+                alert('Next Service කවුන්ටරය නැවත 0 සිට ඇරඹුණි!');
+            }
+        }
+
+        function changeServiceLimit() {
+            const newLimit = prompt('ඔයිල් මාරු කළ යුතු කිලෝමීටර් සීමාව ඇතුළත් කරන්න (උදා: 1000 හෝ 2000):', serviceLimit);
+            if(newLimit && !isNaN(newLimit)) {
+                serviceLimit = parseFloat(newLimit);
+                saveOfflineData();
+                updateUI();
+            }
+        }
+
         function previewManualFuel() {
             const manualKM = parseFloat(document.getElementById('manual-km-input').value);
             const previewBox = document.getElementById('manual-preview-box');
@@ -607,6 +654,7 @@
 
             const fuelNeeded = manualKM / mileage;
             currentFuel = Math.max(0, currentFuel - fuelNeeded);
+            totalDrivenKM += manualKM;
             const dateStr = new Date().toLocaleString();
             const logDesc = `${dateStr} (අතින් දුර: ${manualKM.toFixed(1)}KM)`;
 
@@ -707,6 +755,7 @@
 
             const fuelNeeded = totalTripKM / mileage;
             currentFuel = Math.max(0, currentFuel - fuelNeeded);
+            totalDrivenKM += totalTripKM;
             const dateStr = new Date().toLocaleString();
             const logDesc = `${dateStr} (ජීපීඑස් ගමන: ${totalTripKM.toFixed(1)}KM)`;
 
@@ -750,6 +799,11 @@
             
             const pct = Math.min(100, Math.max(0, (currentFuel / tankCapacity) * 100));
             document.getElementById('fuel-bar').style.width = `${pct}%`;
+
+            // Next Service Tracker Calculation
+            let remainingServiceKM = Math.max(0, serviceLimit - totalDrivenKM);
+            document.getElementById('service-remaining-km').innerText = `${remainingServiceKM.toFixed(0)} KM`;
+            document.getElementById('service-limit-display').innerText = serviceLimit;
 
             let mCost = 0;
             let mLiters = 0;
