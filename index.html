@@ -21,18 +21,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;600;700;900&display=swap');
+        body { font-family: 'Noto Sans Sinhala', sans-serif; }
         
-        body {
-            font-family: 'Noto Sans Sinhala', sans-serif;
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .animate-fade {
-            animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+        .animate-fade { animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
         .app-glass {
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(24px);
@@ -43,6 +39,25 @@
             backdrop-filter: blur(24px);
             border: 1px solid rgba(0, 0, 0, 0.08);
         }
+
+        .tech-bg {
+            background: linear-gradient(135deg, rgba(2, 6, 23, 0.92), rgba(15, 23, 42, 0.95)), 
+                        url('https://images.unsplash.com/photo-1558981403-c5f9899a28bc?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
+            position: relative;
+        }
+        .tech-bg::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(0, 245, 212, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            animation: bgPulse 6s infinite alternate;
+        }
+        @keyframes bgPulse {
+            0% { opacity: 0.4; }
+            100% { opacity: 0.9; }
+        }
+
         .digital-gauge {
             background: radial-gradient(circle, rgba(0, 245, 212, 0.08) 0%, rgba(15, 23, 42, 0.95) 75%);
             box-shadow: inset 0 0 25px rgba(0, 245, 212, 0.15), 0 0 20px rgba(0, 0, 0, 0.5);
@@ -51,16 +66,14 @@
             background: radial-gradient(circle, rgba(0, 187, 158, 0.08) 0%, rgba(255, 255, 255, 0.95) 75%);
             box-shadow: inset 0 0 20px rgba(0, 187, 158, 0.1), 0 10px 25px rgba(0, 0, 0, 0.05);
         }
-        .pulse-glow {
-            animation: glowPulse 2.5s infinite;
-        }
+        .pulse-glow { animation: glowPulse 2.5s infinite; }
         @keyframes glowPulse {
             0%, 100% { box-shadow: 0 0 15px rgba(0, 245, 212, 0.2); }
             50% { box-shadow: 0 0 30px rgba(0, 245, 212, 0.45); }
         }
     </style>
 </head>
-<body class="bg-slate-950 light:bg-slate-100 text-slate-100 light:text-slate-900 min-h-screen selection:bg-brand-500 selection:text-slate-950 transition-colors duration-500">
+<body class="tech-bg text-slate-100 light:text-slate-900 min-h-screen selection:bg-brand-500 selection:text-slate-950 transition-colors duration-500">
 
     <!-- GENERAL WARNING POPUP MODAL -->
     <div id="warning-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
@@ -98,42 +111,53 @@
             </div>
             <div>
                 <h1 class="text-base font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-cyan-400">SMART MEETER</h1>
-                <span class="text-[9px] text-slate-400 font-black uppercase tracking-widest">Digital Dashboard Pro</span>
+                <span id="sync-status" class="text-[9px] text-emerald-400 font-black uppercase tracking-widest">● Online & Synced</span>
             </div>
         </div>
         <div class="flex items-center space-x-2">
             <button onclick="toggleTheme()" class="w-10 h-10 rounded-2xl bg-slate-900 light:bg-slate-200 text-amber-400 flex items-center justify-center transition shadow-md">
                 <i id="theme-icon" class="fa-solid fa-sun text-sm"></i>
             </button>
-            <button onclick="logout()" class="w-10 h-10 rounded-2xl bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition shadow-md">
+            <button onclick="logout()" class="w-10 h-10 rounded-2xl bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition shadow-md" title="මාරු වීම හෝ අයින් වීම">
                 <i class="fa-solid fa-power-off text-sm"></i>
             </button>
         </div>
     </header>
 
-    <!-- AUTH SECTION -->
-    <section id="auth-section" class="max-w-md mx-auto mt-12 p-6 app-glass rounded-3xl shadow-2xl border border-slate-800 light:border-slate-200 mx-4 animate-fade">
-        <div class="text-center mb-6 space-y-2">
-            <div class="w-16 h-16 bg-gradient-to-tr from-brand-500/20 to-accent-500/20 text-brand-500 rounded-3xl flex items-center justify-center mx-auto text-2xl shadow-inner border border-brand-500/30">
-                <i class="fa-solid fa-shield-halved"></i>
+    <!-- AUTH SECTION WITH SAVED VEHICLES QUICK SWITCHER -->
+    <section id="auth-section" class="max-w-md mx-auto mt-8 p-6 app-glass rounded-3xl shadow-2xl border border-brand-500/30 mx-4 animate-fade relative overflow-hidden">
+        <div class="absolute -right-12 -top-12 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        
+        <div class="text-center mb-6 space-y-2 relative z-10">
+            <div class="w-16 h-16 bg-gradient-to-tr from-brand-500/20 to-accent-500/20 text-brand-500 rounded-3xl flex items-center justify-center mx-auto text-2xl shadow-inner border border-brand-500/30 pulse-glow">
+                <i class="fa-solid fa-taxi"></i>
             </div>
-            <h2 id="auth-title" class="text-2xl font-black tracking-tight">රියදුරු ලොගින් වීම</h2>
-            <p id="auth-desc" class="text-xs text-slate-400 font-bold">දුරකථන අංකය සහ මුරපදය ඇතුළත් කරන්න</p>
+            <h2 id="auth-title" class="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-cyan-400">වාහන ලොගින් වීම</h2>
+            <p id="auth-desc" class="text-xs text-slate-400 font-bold">වාහන අංකය සහ මුරපදය ඇතුළත් කරන්න</p>
         </div>
-        <div class="space-y-4">
+
+        <!-- QUICK SWITCHER FOR SAVED VEHICLES -->
+        <div id="saved-vehicles-container" class="mb-5 hidden space-y-2 relative z-10">
+            <label class="block text-[10px] uppercase font-black tracking-wider text-brand-400">සංරක්ෂිත වාහන (Saved Vehicles - එක් ක්ලික් එකකින් ලොග් වන්න)</label>
+            <div id="saved-vehicles-list" class="grid grid-cols-2 gap-2"></div>
+            <div class="border-b border-slate-700/60 my-3"></div>
+        </div>
+
+        <div class="space-y-4 relative z-10">
             <div>
-                <label class="block text-[10px] uppercase font-black tracking-wider text-slate-400 mb-1.5">දුරකථන අංකය</label>
-                <input type="tel" id="auth-phone" placeholder="0771234567" class="w-full bg-slate-900/60 light:bg-slate-100 border border-slate-700 light:border-slate-300 rounded-2xl py-3.5 px-4 text-sm font-black focus:outline-none focus:border-brand-500">
+                <label class="block text-[10px] uppercase font-black tracking-wider text-slate-400 mb-1.5">වාහන අංකය (Vehicle No)</label>
+                <input type="text" id="auth-vehicle" placeholder="WP-ABC-1234" class="w-full bg-slate-900/60 light:bg-slate-100 border border-slate-700 light:border-slate-300 rounded-2xl py-3.5 px-4 text-sm font-black uppercase focus:outline-none focus:border-brand-500 transition">
             </div>
             <div>
                 <label class="block text-[10px] uppercase font-black tracking-wider text-slate-400 mb-1.5">මුරපදය</label>
-                <input type="password" id="auth-pass" placeholder="••••••••" class="w-full bg-slate-900/60 light:bg-slate-100 border border-slate-700 light:border-slate-300 rounded-2xl py-3.5 px-4 text-sm font-black focus:outline-none focus:border-brand-500">
+                <input type="password" id="auth-pass" placeholder="••••••••" class="w-full bg-slate-900/60 light:bg-slate-100 border border-slate-700 light:border-slate-300 rounded-2xl py-3.5 px-4 text-sm font-black focus:outline-none focus:border-brand-500 transition">
             </div>
-            <button onclick="handleAuth()" id="auth-btn" class="w-full bg-gradient-to-r from-brand-500 to-emerald-400 text-slate-950 font-black py-4 rounded-2xl text-sm shadow-lg">
+            <button type="button" onclick="handleAuth()" id="auth-btn" class="w-full bg-gradient-to-r from-brand-500 to-emerald-400 hover:from-brand-600 hover:to-emerald-500 text-slate-950 font-black py-4 rounded-2xl text-sm shadow-lg shadow-brand-500/20 transition transform active:scale-98 flex items-center justify-center space-x-2">
                 <span id="auth-btn-text">ලොග් වන්න</span>
+                <i id="auth-spinner" class="hidden fa-solid fa-circle-notch fa-spin text-base"></i>
             </button>
             <div class="text-center pt-2">
-                <button onclick="toggleMode()" id="toggle-btn" class="text-xs font-bold text-brand-500 hover:underline">
+                <button type="button" onclick="toggleMode()" id="toggle-btn" class="text-xs font-bold text-brand-500 hover:underline transition">
                     ගිණුමක් නැද්ද? ලියාපදිංචි වන්න
                 </button>
             </div>
@@ -174,7 +198,7 @@
                         <i class="fa-solid fa-gauge-high"></i>
                         <span>ඩිජිටල් ඉන්ධන මීටරය</span>
                     </h3>
-                    <span id="display-phone" class="text-[11px] font-black px-3 py-1 rounded-xl bg-slate-900 light:bg-slate-200 text-brand-400 shadow-inner"></span>
+                    <span id="display-vehicle" class="text-[11px] font-black px-3 py-1 rounded-xl bg-slate-900 light:bg-slate-200 text-brand-400 shadow-inner"></span>
                 </div>
 
                 <div class="digital-gauge rounded-3xl p-6 text-center space-y-3 border border-brand-500/30 shadow-inner relative overflow-hidden">
@@ -212,25 +236,21 @@
                 </div>
             </div>
 
-            <!-- NEXT SERVICE / OIL CHANGE TRACKER PANEL -->
+            <!-- NEXT SERVICE TRACKER -->
             <div class="app-glass rounded-3xl p-5 shadow-xl space-y-3 border border-slate-800 light:border-slate-200">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center space-x-2">
                         <i class="fa-solid fa-oil-can"></i>
                         <span>ඊළඟ ඔයිල් මාරුවට (Next Service) ඉතිරි දුර</span>
                     </h3>
-                    <button onclick="resetServiceCounter()" class="bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-950 text-[10px] font-black px-2.5 py-1 rounded-xl transition">
-                        Reset
-                    </button>
+                    <button onclick="resetServiceCounter()" class="bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-950 text-[10px] font-black px-2.5 py-1 rounded-xl transition">Reset</button>
                 </div>
                 <div class="bg-slate-950/50 light:bg-slate-100 p-3.5 rounded-2xl border border-slate-800 light:border-slate-200 flex justify-between items-center shadow-inner">
                     <div>
                         <span id="service-remaining-km" class="text-2xl font-black text-amber-400">1000 KM</span>
-                        <span class="text-[10px] text-slate-400 block font-bold">සීමාව: <span id="service-limit-display">1000</span> KM ට වතාවක්</span>
+                        <span class="text-[10px] text-slate-400 block font-bold">සීමාව: <span id="service-limit-display">1000</span> KM</span>
                     </div>
-                    <button onclick="changeServiceLimit()" class="bg-slate-900 light:bg-white text-slate-300 light:text-slate-700 text-xs font-black px-3 py-2 rounded-xl border border-slate-700 light:border-slate-300 shadow-sm">
-                        සීමාව වෙනස් කරන්න
-                    </button>
+                    <button onclick="changeServiceLimit()" class="bg-slate-900 light:bg-white text-xs font-black px-3 py-2 rounded-xl border border-slate-700 light:border-slate-300">වෙනස් කරන්න</button>
                 </div>
             </div>
 
@@ -324,14 +344,13 @@
             </div>
         </div>
 
-        <!-- TAB 3: VEHICLE DOCUMENTS & EXPIRY TRACKER -->
+        <!-- TAB 3: DOCUMENTS -->
         <div id="tab-documents" class="tab-content hidden space-y-4">
             <div class="app-glass rounded-3xl p-6 shadow-xl space-y-4 border border-slate-800 light:border-slate-200">
                 <h3 class="text-sm font-black uppercase tracking-wider flex items-center space-x-2 text-amber-400">
                     <i class="fa-solid fa-file-shield"></i>
                     <span>වාහන ලියකියවිලි කල් ඉකුත් වන දින (Expiry Dates)</span>
                 </h3>
-                
                 <div class="space-y-4">
                     <div class="bg-slate-950/50 light:bg-slate-100 p-4 rounded-2xl border border-slate-800 light:border-slate-200 space-y-2">
                         <div class="flex justify-between items-center">
@@ -393,10 +412,11 @@
     </main>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjMt6fvBAfQ-zOy3YkJvB1WzurDuQVliTjhpx83Th0wtTjKPzQWW4E2A0Ugs3a0eRt/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzqkQnYlcfKlizdu19yUJYeAF8zasYRKGP3kW7x9x9V3eQwhxMtyfPb6esxm5yFfHUa/exec";
 
         let isRegisterState = false;
-        let currentPhone = "";
+        let currentVehicle = "";
+        let currentPass = "";
         let tankCapacity = 8;
         let mileage = 30;
         let currentFuel = 0.0;
@@ -408,6 +428,62 @@
         let totalTripKM = 0;
         let lastPosition = null;
         let alertShownForThisLowFuel = false;
+
+        // Load saved vehicle accounts on startup
+        window.addEventListener('DOMContentLoaded', () => {
+            renderSavedVehicles();
+        });
+
+        window.addEventListener('online', () => {
+            document.getElementById('sync-status').innerText = "● Online & Synced";
+            document.getElementById('sync-status').className = "text-[9px] text-emerald-400 font-black uppercase tracking-widest";
+            syncDataToCloud();
+        });
+
+        window.addEventListener('offline', () => {
+            document.getElementById('sync-status').innerText = "● Offline Mode";
+            document.getElementById('sync-status').className = "text-[9px] text-amber-400 font-black uppercase tracking-widest";
+        });
+
+        function getSavedAccounts() {
+            try {
+                return JSON.parse(localStorage.getItem('smart_meeter_saved_vehicles')) || {};
+            } catch(e) {
+                return {};
+            }
+        }
+
+        function saveAccountCredential(vehNo, pass) {
+            let accounts = getSavedAccounts();
+            accounts[vehNo] = pass;
+            localStorage.setItem('smart_meeter_saved_vehicles', JSON.stringify(accounts));
+            renderSavedVehicles();
+        }
+
+        function renderSavedVehicles() {
+            let accounts = getSavedAccounts();
+            let keys = Object.keys(accounts);
+            let container = document.getElementById('saved-vehicles-container');
+            let list = document.getElementById('saved-vehicles-list');
+
+            if(keys.length > 0) {
+                container.classList.remove('hidden');
+                list.innerHTML = keys.map(veh => `
+                    <button type="button" onclick="quickLogin('${veh}', '${accounts[veh]}')" class="bg-slate-900/80 hover:bg-brand-500 hover:text-slate-950 text-brand-400 border border-brand-500/30 py-2.5 px-3 rounded-xl text-xs font-black transition flex items-center justify-between shadow-md">
+                        <span><i class="fa-solid fa-taxi mr-1.5"></i> ${veh}</span>
+                        <i class="fa-solid fa-arrow-right-to-bracket text-[10px]"></i>
+                    </button>
+                `).join('');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function quickLogin(veh, pass) {
+            document.getElementById('auth-vehicle').value = veh;
+            document.getElementById('auth-pass').value = pass;
+            handleAuth();
+        }
 
         function toggleTheme() {
             const html = document.documentElement;
@@ -433,140 +509,193 @@
 
         function toggleMode() {
             isRegisterState = !isRegisterState;
-            document.getElementById('auth-title').innerText = isRegisterState ? 'නව ගිණුමක් තනන්න' : 'රියදුරු ලොගින් වීම';
-            document.getElementById('auth-desc').innerText = isRegisterState ? 'දුරකථන අංකය සහ මුරපදයක් සාදාගන්න' : 'දුරකථන අංකය සහ මුරපදය ඇතුළත් කරන්න';
+            document.getElementById('auth-title').innerText = isRegisterState ? 'නව වාහන ගිණුමක් තනන්න' : 'වාහන ලොගින් වීම';
+            document.getElementById('auth-desc').innerText = isRegisterState ? 'වාහන අංකය සහ මුරපදයක් සාදාගන්න' : 'වාහන අංකය සහ මුරපදය ඇතුළත් කරන්න';
             document.getElementById('auth-btn-text').innerText = isRegisterState ? 'ලියාපදිංචි වන්න' : 'ලොග් වන්න';
             document.getElementById('toggle-btn').innerText = isRegisterState ? 'දැනටමත් ගිණුමක් තිබේද? ලොග් වන්න' : 'ගිණුමක් නැද්ද? ලියාපදිංචි වන්න';
             document.getElementById('auth-msg').innerText = "";
         }
 
         async function handleAuth() {
-            const phone = document.getElementById('auth-phone').value.trim();
+            const vehicle = document.getElementById('auth-vehicle').value.trim().toUpperCase();
             const pass = document.getElementById('auth-pass').value.trim();
             const msgEl = document.getElementById('auth-msg');
+            const btnText = document.getElementById('auth-btn-text');
+            const spinner = document.getElementById('auth-spinner');
+            const authBtn = document.getElementById('auth-btn');
 
-            if(!phone || !pass) {
+            if(!vehicle || !pass) {
                 msgEl.innerText = "කරුණාකර සියලුම විස්තර පුරවන්න!";
                 return;
             }
+
+            msgEl.innerText = "";
+            btnText.innerText = "පරීක්ෂා කරමින් පවතී...";
+            spinner.classList.remove('hidden');
+            authBtn.disabled = true;
 
             const action = isRegisterState ? "register" : "login";
 
             try {
                 const res = await fetch(SCRIPT_URL, {
                     method: "POST",
-                    body: JSON.stringify({ action: action, phone: phone, password: pass })
+                    body: JSON.stringify({ action: action, phone: vehicle, password: pass })
                 });
                 const data = await res.json();
                 
+                spinner.classList.add('hidden');
+                authBtn.disabled = false;
+                btnText.innerText = isRegisterState ? 'ලියාපදිංචි වන්න' : 'ලොග් වන්න';
+
                 if(data.status === "success") {
+                    saveAccountCredential(vehicle, pass);
                     if(isRegisterState) {
-                        alert('ගිණුම සාර්ථකයි! දැන් ලොග් වන්න.');
+                        alert('වාහන ගිණුම සාර්ථකයි! දැන් ලොග් වන්න.');
                         toggleMode();
                     } else {
-                        currentPhone = phone;
-                        currentFuel = 0.0;
-                        document.getElementById('display-phone').innerText = `📞 ${phone}`;
+                        currentVehicle = vehicle;
+                        currentPass = pass;
+                        document.getElementById('display-vehicle').innerText = `🛺 ${vehicle}`;
                         document.getElementById('auth-section').classList.add('hidden');
                         document.getElementById('dashboard-section').classList.remove('hidden');
-                        loadOfflineData();
+                        
+                        if(data.data && data.data !== "") {
+                            parseAndLoadCloudPayload(data.data);
+                        } else {
+                            loadOfflineData();
+                        }
                         checkDocumentExpiryAlerts();
                     }
                 } else {
                     msgEl.innerText = data.message || "ප්‍රවේශ වීම අසාර්ථකයි!";
                 }
             } catch(e) {
-                if(!isRegisterState && phone) {
-                    currentPhone = phone;
-                    document.getElementById('display-phone').innerText = `📞 ${phone} (Offline)`;
+                spinner.classList.add('hidden');
+                authBtn.disabled = false;
+                btnText.innerText = isRegisterState ? 'ලියාපදිංචි වන්න' : 'ලොග් වන්න';
+
+                if(!isRegisterState && vehicle) {
+                    saveAccountCredential(vehicle, pass);
+                    currentVehicle = vehicle;
+                    currentPass = pass;
+                    document.getElementById('display-vehicle').innerText = `🛺 ${vehicle} (Offline)`;
                     document.getElementById('auth-section').classList.add('hidden');
                     document.getElementById('dashboard-section').classList.remove('hidden');
                     loadOfflineData();
                     checkDocumentExpiryAlerts();
                 } else {
-                    msgEl.innerText = "සම්බන්ධ වීමේ දෝෂයක් සිදු විය.";
+                    msgEl.innerText = "සම්බන්ධ වීමේ දෝෂයක් සිදු විය (අන්තර්ජාලය පරීක්ෂා කරන්න).";
                 }
             }
         }
 
         function logout() {
-            currentPhone = "";
+            currentVehicle = "";
+            currentPass = "";
             document.getElementById('dashboard-section').classList.add('hidden');
             document.getElementById('auth-section').classList.remove('hidden');
-            document.getElementById('auth-phone').value = '';
+            document.getElementById('auth-vehicle').value = '';
             document.getElementById('auth-pass').value = '';
+            renderSavedVehicles();
         }
 
         function updateSettings() {
             mileage = parseFloat(document.getElementById('input-mileage').value) || 30;
             tankCapacity = parseFloat(document.getElementById('input-tank').value) || 8;
             
-            if(currentPhone) {
-                localStorage.setItem(`mileage_${currentPhone}`, mileage);
-                localStorage.setItem(`tank_${currentPhone}`, tankCapacity);
+            if(currentVehicle) {
+                localStorage.setItem(`mileage_${currentVehicle}`, mileage);
+                localStorage.setItem(`tank_${currentVehicle}`, tankCapacity);
             }
+            saveAndSync();
             updateUI();
         }
 
-        function saveOfflineData() {
-            if(currentPhone) {
-                localStorage.setItem(`history_${currentPhone}`, JSON.stringify(historyData));
-                localStorage.setItem(`drivenKM_${currentPhone}`, totalDrivenKM);
-                localStorage.setItem(`serviceLimit_${currentPhone}`, serviceLimit);
-            }
+        function saveAndSync() {
+            if(!currentVehicle) return;
+            
+            const payload = {
+                mileage: mileage,
+                tankCapacity: tankCapacity,
+                currentFuel: currentFuel,
+                totalDrivenKM: totalDrivenKM,
+                serviceLimit: serviceLimit,
+                historyData: historyData,
+                emission: document.getElementById('date-emission').value,
+                insurance: document.getElementById('date-insurance').value,
+                revenue: document.getElementById('date-revenue').value
+            };
+
+            localStorage.setItem(`app_data_${currentVehicle}`, JSON.stringify(payload));
+            syncDataToCloud();
         }
 
-        function saveDocumentDates() {
-            if(currentPhone) {
-                const emission = document.getElementById('date-emission').value;
-                const insurance = document.getElementById('date-insurance').value;
-                const revenue = document.getElementById('date-revenue').value;
+        async function syncDataToCloud() {
+            if(!currentVehicle || !navigator.onLine) return;
 
-                localStorage.setItem(`doc_emission_${currentPhone}`, emission);
-                localStorage.setItem(`doc_insurance_${currentPhone}`, insurance);
-                localStorage.setItem(`doc_revenue_${currentPhone}`, revenue);
-                checkDocumentExpiryAlerts();
+            const payloadStr = localStorage.getItem(`app_data_${currentVehicle}`);
+            if(!payloadStr) return;
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "save",
+                        phone: currentVehicle,
+                        password: currentPass,
+                        payload: payloadStr
+                    })
+                });
+            } catch(err) {
+                console.log("Cloud sync delayed.");
             }
         }
 
         function loadOfflineData() {
-            if(currentPhone) {
-                const savedMileage = localStorage.getItem(`mileage_${currentPhone}`);
-                mileage = savedMileage ? parseFloat(savedMileage) : 30;
-                document.getElementById('input-mileage').value = mileage;
+            if(!currentVehicle) return;
 
-                const savedTank = localStorage.getItem(`tank_${currentPhone}`);
-                tankCapacity = savedTank ? parseFloat(savedTank) : 8;
-                document.getElementById('input-tank').value = tankCapacity;
-
-                const savedDriven = localStorage.getItem(`drivenKM_${currentPhone}`);
-                totalDrivenKM = savedDriven ? parseFloat(savedDriven) : 0;
-
-                const savedLimit = localStorage.getItem(`serviceLimit_${currentPhone}`);
-                serviceLimit = savedLimit ? parseFloat(savedLimit) : 1000;
-
-                const emission = localStorage.getItem(`doc_emission_${currentPhone}`);
-                if(emission) document.getElementById('date-emission').value = emission;
-
-                const insurance = localStorage.getItem(`doc_insurance_${currentPhone}`);
-                if(insurance) document.getElementById('date-insurance').value = insurance;
-
-                const revenue = localStorage.getItem(`doc_revenue_${currentPhone}`);
-                if(revenue) document.getElementById('date-revenue').value = revenue;
-
-                const saved = localStorage.getItem(`history_${currentPhone}`);
-                if(saved) {
-                    historyData = JSON.parse(saved);
-                    if(historyData.length > 0) {
-                        currentFuel = parseFloat(historyData[historyData.length - 1].currentFuel) || 0.0;
-                    }
-                }
+            const savedPayload = localStorage.getItem(`app_data_${currentVehicle}`);
+            if(savedPayload) {
+                parseAndLoadCloudPayload(savedPayload);
+            } else {
+                mileage = 30;
+                tankCapacity = 8;
+                currentFuel = 0.0;
+                totalDrivenKM = 0;
+                serviceLimit = 1000;
+                historyData = [];
                 updateUI();
             }
         }
 
+        function parseAndLoadCloudPayload(jsonStr) {
+            try {
+                const data = JSON.parse(jsonStr);
+                mileage = data.mileage || 30;
+                tankCapacity = data.tankCapacity || 8;
+                currentFuel = data.currentFuel || 0.0;
+                totalDrivenKM = data.totalDrivenKM || 0;
+                serviceLimit = data.serviceLimit || 1000;
+                historyData = data.historyData || [];
+
+                if(data.emission) document.getElementById('date-emission').value = data.emission;
+                if(data.insurance) document.getElementById('date-insurance').value = data.insurance;
+                if(data.revenue) document.getElementById('date-revenue').value = data.revenue;
+
+                localStorage.setItem(`app_data_${currentVehicle}`, jsonStr);
+                updateUI();
+            } catch(e) {
+                console.error("Payload parse error");
+            }
+        }
+
+        function saveDocumentDates() {
+            saveAndSync();
+            checkDocumentExpiryAlerts();
+        }
+
         function checkDocumentExpiryAlerts() {
-            if(!currentPhone) return;
+            if(!currentVehicle) return;
             const today = new Date();
             today.setHours(0,0,0,0);
 
@@ -616,7 +745,7 @@
         function resetServiceCounter() {
             if(confirm('ඔබ ඔයිල් මාරු කිරීම සිදුකළ බවට Reset කිරීමට අවශ්‍යද?')) {
                 totalDrivenKM = 0;
-                saveOfflineData();
+                saveAndSync();
                 updateUI();
                 alert('Next Service කවුන්ටරය නැවත 0 සිට ඇරඹුණි!');
             }
@@ -626,7 +755,7 @@
             const newLimit = prompt('ඔයිල් මාරු කළ යුතු කිලෝමීටර් සීමාව ඇතුළත් කරන්න (උදා: 1000 හෝ 2000):', serviceLimit);
             if(newLimit && !isNaN(newLimit)) {
                 serviceLimit = parseFloat(newLimit);
-                saveOfflineData();
+                saveAndSync();
                 updateUI();
             }
         }
@@ -659,7 +788,7 @@
             const logDesc = `${dateStr} (අතින් දුර: ${manualKM.toFixed(1)}KM)`;
 
             historyData.push({ date: logDesc, liters: -parseFloat(fuelNeeded.toFixed(2)), cost: 0, currentFuel: currentFuel });
-            saveOfflineData();
+            saveAndSync();
             updateUI();
 
             alert(`සාර්ථකයි! ගමන් කළ දුර: ${manualKM.toFixed(1)} KM. අඩු වූ තෙල්: ${fuelNeeded.toFixed(2)} L.`);
@@ -677,7 +806,7 @@
 
             const dateStr = new Date().toLocaleString();
             historyData.push({ date: dateStr, liters: liters, cost: cost, currentFuel: currentFuel });
-            saveOfflineData();
+            saveAndSync();
             updateUI();
 
             document.getElementById('refuel-liters').value = '';
@@ -695,7 +824,7 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `smart_meeter_history_${currentPhone}.csv`);
+            link.setAttribute("download", `smart_meeter_history_${currentVehicle}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -735,7 +864,7 @@
                     }
                     lastPosition = currentCoords;
                 },
-                (error) => { alert("GPS දෝෂයක්!"); },
+                (error) => { alert("ජීපීඑස් සංඥා ලබාගැනීමේ දෝෂයක්!"); },
                 { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
             );
         }
@@ -760,7 +889,7 @@
             const logDesc = `${dateStr} (ජීපීඑස් ගමන: ${totalTripKM.toFixed(1)}KM)`;
 
             historyData.push({ date: logDesc, liters: -parseFloat(fuelNeeded.toFixed(2)), cost: 0, currentFuel: currentFuel });
-            saveOfflineData();
+            saveAndSync();
             updateUI();
 
             alert(`ගමන සාර්ථකයි! ගිය දුර: ${totalTripKM.toFixed(1)} KM. අඩු වූ තෙල්: ${fuelNeeded.toFixed(2)} L.`);
@@ -800,7 +929,6 @@
             const pct = Math.min(100, Math.max(0, (currentFuel / tankCapacity) * 100));
             document.getElementById('fuel-bar').style.width = `${pct}%`;
 
-            // Next Service Tracker Calculation
             let remainingServiceKM = Math.max(0, serviceLimit - totalDrivenKM);
             document.getElementById('service-remaining-km').innerText = `${remainingServiceKM.toFixed(0)} KM`;
             document.getElementById('service-limit-display').innerText = serviceLimit;
