@@ -840,40 +840,62 @@
         }
 
         function startLiveTrip() {
-            if (!navigator.geolocation) { alert("GPS සඳහා සහය නොදක්වයි!"); return; }
+    if (!navigator.geolocation) { alert("GPS සඳහා සහය නොදක්වයි!"); return; }
 
-            totalTripKM = 0;
-            lastPosition = null;
-            document.getElementById('trip-status-text').innerText = "ගමන යමින් පවතී... (GPS ක්‍රියාත්මකයි)";
-            document.getElementById('start-trip-btn').classList.add('hidden');
-            document.getElementById('end-trip-btn').classList.remove('hidden');
+    totalTripKM = 0;
+    lastPosition = null;
+    document.getElementById('trip-status-text').innerText = "ගමන යමින් පවතී... (GPS ක්‍රියාත්මකයි)";
+    document.getElementById('start-trip-btn').classList.add('hidden');
+    document.getElementById('end-trip-btn').classList.remove('hidden');
 
-            watchId = navigator.geolocation.watchPosition(
-                (position) => {
-                    const currentCoords = { lat: position.coords.latitude, lng: position.coords.longitude };
+    watchId = navigator.geolocation.watchPosition(
+        (position) => {
+            const currentCoords = { 
+                lat: position.coords.latitude, 
+                lng: position.coords.longitude,
+                accuracy: position.coords.accuracy,
+                speed: position.coords.speed // මීටරයට ලැබෙන සැබෑ වේගය (මීටර් වලින් තත්පරයට - m/s)
+            };
+            
+            // 1. නිරවද්‍යතාවය පරීක්ෂා කිරීම (Accuracy Filter - මීටර් 30 ට වැඩි නම් මඟහරින්න)
+            if (currentCoords.accuracy > 30) {
+                return; 
+            }
+
+            // 2. වේගය පරීක්ෂා කිරීම (Speed Check): 
+            // ත්‍රීවීල් එක නවත්වාගෙන ඉද්දී හෝ ගෙදර ඇතුළේ ඉද්දී වේගය 0 ක් හෝ ඉතාම අඩු අගයක් ගනී. 
+            // (0.8 m/s යනු පැයට කිලෝමීටර් ~3 ක වේගයකි. මීට වඩා අඩු නම් වාහනය නතර කර ඇතැයි සලකනු ලැබේ).
+            if (currentCoords.speed !== null && currentCoords.speed < 0.8) {
+                return; // වාහනය නතර කර ඇති නිසා මීටරය දුවන්නේ නැත!
+            }
+
+            if (lastPosition) {
+                const distKM = calculateDistance(lastPosition.lat, lastPosition.lng, currentCoords.lat, currentCoords.lng);
+                
+                // 3. එකපාරටම GPS පැනීම (Glitch) වැළැක්වීම (මීටර් 100 කට වඩා වැඩි පැනීම් ඉවත් කිරීම)
+                if (distKM > 0.1) {
+                    return; 
+                }
+
+                // 4. අවම දුර සීමාව (මීටර් 10 කට වඩා වැඩි චලනයන් පමණක් එකතු කිරීම)
+                if (distKM > 0.01) {
+                    totalTripKM += distKM;
+                    document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
                     
-                    if (lastPosition) {
-                        const distKM = calculateDistance(lastPosition.lat, lastPosition.lng, currentCoords.lat, currentCoords.lng);
-                        
-                        // 🛑 GPS DRIFT FILTER: මීටර් 4කට (0.004 KM) වඩා අඩු චලනයන් නොසලකා හැරීම
-                        if (distKM > 0.02) {
-                            totalTripKM += distKM;
-                            document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
-                            
-                            const fuelNeeded = totalTripKM / mileage;
-                            let tempFuel = Math.max(0, currentFuel - fuelNeeded);
-                            if (tempFuel <= 1.0 && !alertShownForThisLowFuel) showLowFuelModal(tempFuel);
-                            
-                            lastPosition = currentCoords;
-                        }
-                    } else {
-                        lastPosition = currentCoords;
-                    }
-                },
-                (error) => { console.log("GPS signal waiting..."); },
-                { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
-            );
-        }
+                    const fuelNeeded = totalTripKM / mileage;
+                    let tempFuel = Math.max(0, currentFuel - fuelNeeded);
+                    if (tempFuel <= 1.0 && !alertShownForThisLowFuel) showLowFuelModal(tempFuel);
+                    
+                    lastPosition = currentCoords;
+                }
+            } else {
+                lastPosition = currentCoords;
+            }
+        },
+        (error) => { console.log("GPS signal waiting..."); },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+    );
+}
 
         async function endLiveTrip() {
             if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
