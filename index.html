@@ -840,16 +840,17 @@
             return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
-      async function startLiveTrip() {
-    if (!navigator.geolocation) { alert("GPS සඳහා සහය නොදක්වයි!"); return; }
+   // 1. ගමන ආරම්භ කිරීම සහ Smart Filter ක්‍රියාත්මක කිරීම
+    async function startLiveTrip() {
+         if (!navigator.geolocation) { alert("GPS සඳහා සහය නොදක්වයි!"); return; }
 
-    // 🌟 ස්ක්‍රීන් එක ඕෆ් වීම වැළැක්වීම (Wake Lock Request)
+    // 🌟 ගමන යන අතරතුර ස්ක්‍රීන් එක ඕෆ් වීම වැළැක්වීම
     try {
         if ('wakeLock' in navigator) {
             wakeLock = await navigator.wakeLock.request('screen');
         }
     } catch (err) {
-        console.log(err);
+        console.log("Wake Lock error:", err);
     }
 
     totalTripKM = 0;
@@ -858,39 +859,35 @@
     document.getElementById('start-trip-btn').classList.add('hidden');
     document.getElementById('end-trip-btn').classList.remove('hidden');
 
-    // ... ඉතිරි ජීපීඑස් කෝඩ් කොටස මෙහි ඇත ...
-
     watchId = navigator.geolocation.watchPosition(
         (position) => {
             const currentCoords = { 
                 lat: position.coords.latitude, 
                 lng: position.coords.longitude,
-                accuracy: position.coords.accuracy,
-                speed: position.coords.speed // මීටරයට ලැබෙන සැබෑ වේගය (මීටර් වලින් තත්පරයට - m/s)
+                accuracy: position.coords.accuracy, // GPS නිරවද්‍යතාවය (මීටර් වලින්)
+                speed: position.coords.speed        // වාහනයේ සැබෑ වේගය (m/s)
             };
             
-            // 1. නිරවද්‍යතාවය පරීක්ෂා කිරීම (Accuracy Filter - මීටර් 30 ට වැඩි නම් මඟහරින්න)
+            // 🛑 1. නිරවද්‍යතාවය පරීක්ෂා කිරීම (මීටර් 30 කට වඩා වැඩි නම් මඟහරින්න)
             if (currentCoords.accuracy > 30) {
                 return; 
             }
 
-            // 2. වේගය පරීක්ෂා කිරීම (Speed Check): 
-            // ත්‍රීවීල් එක නවත්වාගෙන ඉද්දී හෝ ගෙදර ඇතුළේ ඉද්දී වේගය 0 ක් හෝ ඉතාම අඩු අගයක් ගනී. 
-            // (0.8 m/s යනු පැයට කිලෝමීටර් ~3 ක වේගයකි. මීට වඩා අඩු නම් වාහනය නතර කර ඇතැයි සලකනු ලැබේ).
+            // 🛑 2. වේගය පරීක්ෂා කිරීම (වේගය 0.8 m/s හෝ ~3 km/h ට වඩා අඩු නම් මීටරය දුවන්නේ නැත)
             if (currentCoords.speed !== null && currentCoords.speed < 0.8) {
-                return; // වාහනය නතර කර ඇති නිසා මීටරය දුවන්නේ නැත!
+                return; 
             }
 
             if (lastPosition) {
                 const distKM = calculateDistance(lastPosition.lat, lastPosition.lng, currentCoords.lat, currentCoords.lng);
                 
-                // 3. එකපාරටම GPS පැනීම (Glitch) වැළැක්වීම (මීටර් 100 කට වඩා වැඩි පැනීම් ඉවත් කිරීම)
+                // 🛑 3. එකපාරටම GPS පැනීම (Glitch) වැළැක්වීම (මීටර් 100 කට වැඩි පැනීම් ඉවත් කිරීම)
                 if (distKM > 0.1) {
                     return; 
                 }
 
-                // 4. අවම දුර සීමාව (මීටර් 10 කට වඩා වැඩි චලනයන් පමණක් එකතු කිරීම)
-                if (distKM > 0.01) {
+                // 🛑 4. අවම චලන සීමාව (මීටර් 15 කට හෝ 0.015 KM ට වඩා වැඩි චලනයන් පමණක් එකතු කිරීම)
+                if (distKM > 0.015) {
                     totalTripKM += distKM;
                     document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
                     
@@ -904,21 +901,31 @@
                 lastPosition = currentCoords;
             }
         },
-        (error) => { console.log("GPS signal waiting..."); },
+        (error) => { console.log("GPS සංඥා අපේක්ෂා කරයි..."); },
         { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
     );
 }
-     async function endLiveTrip() {
-         if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+     // 2. ගමන අවසන් කිරීම සහ Wake Lock නිදහස් කිරීම
+async function endLiveTrip() {
+    if (watchId !== null) { 
+        navigator.geolocation.clearWatch(watchId); 
+        watchId = null; 
+    }
 
-        // 🌟 ස්ක්‍රීන් ලොක් එක නිදහස් කිරීම
-        if (wakeLock !== null) {
-        await wakeLock.release();
-        wakeLock = null;
+    // 🌟 ස්ක්‍රීන් ලොක් එක සාමාන්‍ය තත්වයට පත් කිරීම
+    if (wakeLock !== null) {
+        try {
+            await wakeLock.release();
+            wakeLock = null;
+        } catch (err) {
+            console.log("Wake Lock release error:", err);
+        }
     }
 
     document.getElementById('start-trip-btn').classList.remove('hidden');
     document.getElementById('end-trip-btn').classList.add('hidden');
+    document.getElementById('trip-status-text').innerText = "ගමන අවසන් කරන ලදී.";
+}
     
     // ... ඉතිරි කෝඩ් කොටස මෙහි ඇත ...
 
