@@ -429,7 +429,6 @@
         let lastPosition = null;
         let alertShownForThisLowFuel = false;
 
-        // Load saved vehicle accounts on startup
         window.addEventListener('DOMContentLoaded', () => {
             renderSavedVehicles();
         });
@@ -852,20 +851,27 @@
             watchId = navigator.geolocation.watchPosition(
                 (position) => {
                     const currentCoords = { lat: position.coords.latitude, lng: position.coords.longitude };
+                    
                     if (lastPosition) {
-                        const dist = calculateDistance(lastPosition.lat, lastPosition.lng, currentCoords.lat, currentCoords.lng);
-                        if (dist > 0.01) {
-                            totalTripKM += dist;
+                        const distKM = calculateDistance(lastPosition.lat, lastPosition.lng, currentCoords.lat, currentCoords.lng);
+                        
+                        // 🛑 GPS DRIFT FILTER: මීටර් 4කට (0.004 KM) වඩා අඩු චලනයන් නොසලකා හැරීම
+                        if (distKM > 0.004) {
+                            totalTripKM += distKM;
                             document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
+                            
                             const fuelNeeded = totalTripKM / mileage;
                             let tempFuel = Math.max(0, currentFuel - fuelNeeded);
                             if (tempFuel <= 1.0 && !alertShownForThisLowFuel) showLowFuelModal(tempFuel);
+                            
+                            lastPosition = currentCoords;
                         }
+                    } else {
+                        lastPosition = currentCoords;
                     }
-                    lastPosition = currentCoords;
                 },
-                (error) => { alert("ජීපීඑස් සංඥා ලබාගැනීමේ දෝෂයක්!"); },
-                { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+                (error) => { console.log("GPS signal waiting..."); },
+                { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
             );
         }
 
