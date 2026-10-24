@@ -425,12 +425,36 @@
         let serviceLimit = 1000;
 
         let watchId = null;
+        let screenWakeLock = null;
         let totalTripKM = 0;
         let lastPosition = null;
         let alertShownForThisLowFuel = false;
 
         window.addEventListener('DOMContentLoaded', () => {
             renderSavedVehicles();
+        });
+
+        // Keep the screen awake during an active trip where the browser supports Screen Wake Lock.
+        async function requestTripWakeLock() {
+            if (!('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
+            try {
+                if (screenWakeLock) return;
+                screenWakeLock = await navigator.wakeLock.request('screen');
+                screenWakeLock.addEventListener('release', () => { screenWakeLock = null; });
+            } catch (err) {
+                console.warn('Screen Wake Lock unavailable:', err);
+            }
+        }
+
+        async function releaseTripWakeLock() {
+            if (screenWakeLock) {
+                try { await screenWakeLock.release(); } catch (err) {}
+                screenWakeLock = null;
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (watchId !== null && document.visibilityState === 'visible') requestTripWakeLock();
         });
 
         window.addEventListener('online', () => {
@@ -843,7 +867,7 @@
             return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
-        function startLiveTrip() {
+        async function startLiveTrip() {
             if (!navigator.geolocation) {
                 alert("මෙම browser එක GPS සඳහා සහය නොදක්වයි. iPhone Safari හෝ Android Chrome යාවත්කාලීන කරන්න.");
                 return;
@@ -857,6 +881,7 @@
                 watchId = null;
             }
 
+            await requestTripWakeLock();
             totalTripKM = 0;
             lastPosition = null;
             alertShownForThisLowFuel = false;
@@ -929,6 +954,7 @@
 
         async function endLiveTrip() {
             if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+            await releaseTripWakeLock();
 
             document.getElementById('start-trip-btn').classList.remove('hidden');
             document.getElementById('end-trip-btn').classList.add('hidden');
