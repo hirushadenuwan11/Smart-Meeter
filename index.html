@@ -848,13 +848,10 @@
                 alert("මෙම browser එක GPS සඳහා සහය නොදක්වයි. iPhone Safari හෝ Android Chrome යාවත්කාලීන කරන්න.");
                 return;
             }
-
-            // GPS සඳහා HTTPS (හෝ localhost) භාවිතා කරන්න. file:/// මත browser අනුව සීමා තිබිය හැක.
             if (!window.isSecureContext && location.protocol !== "file:") {
-                alert("GPS භාවිතයට ආරක්ෂිත HTTPS website එකක් අවශ්‍යයි. Website එක HTTPS හරහා විවෘත කරන්න.");
+                alert("GPS භාවිතයට HTTPS website එකක් අවශ්‍යයි. Website එක HTTPS හරහා විවෘත කරන්න.");
                 return;
             }
-
             if (watchId !== null) {
                 navigator.geolocation.clearWatch(watchId);
                 watchId = null;
@@ -871,54 +868,52 @@
             watchId = navigator.geolocation.watchPosition(
                 (position) => {
                     const c = position.coords;
-                    const currentCoords = {
+                    const current = {
                         lat: c.latitude,
                         lng: c.longitude,
                         accuracy: Number.isFinite(c.accuracy) ? c.accuracy : 9999,
-                        speed: c.speed
+                        time: position.timestamp || Date.now()
                     };
 
-                    // අධික දෝෂ සහිත reading පමණක් මඟහරින්න; Android/iPhone සඳහා 30m දැඩි සීමාවක් නොතබන්න.
-                    if (currentCoords.accuracy > 100) {
+                    // GPS accuracy දුර්වල නම් ඒ reading එකෙන් දුර එකතු නොකරන්න.
+                    // Phone GPS එකෙන් ලැබෙන ± accuracy අගය 25m ඉක්මවූ විට noise වැඩියි.
+                    if (current.accuracy > 25) {
                         document.getElementById('trip-status-text').innerText =
-                            `GPS සංඥාව දුර්වලයි (Accuracy ${Math.round(currentCoords.accuracy)}m). විවෘත ස්ථානයකට යන්න.`;
+                            `GPS සංඥාව දුර්වලයි (±${Math.round(current.accuracy)}m). එළිමහන් ස්ථානයක සිටින්න.`;
                         return;
                     }
 
                     document.getElementById('trip-status-text').innerText =
-                        `GPS සම්බන්ධයි (±${Math.round(currentCoords.accuracy)}m). ගමන ගණනය කරමින්...`;
+                        `GPS සම්බන්ධයි (±${Math.round(current.accuracy)}m). ගමන ගණනය කරමින්...`;
 
                     if (!lastPosition) {
-                        lastPosition = currentCoords;
+                        lastPosition = current;
                         return;
                     }
 
-                    const distKM = calculateDistance(
-                        lastPosition.lat, lastPosition.lng,
-                        currentCoords.lat, currentCoords.lng
-                    );
+                    const distKM = calculateDistance(lastPosition.lat, lastPosition.lng, current.lat, current.lng);
+                    const distM = distKM * 1000;
+                    const elapsedSec = Math.max(1, (current.time - lastPosition.time) / 1000);
 
-                    // ඉතා විශාල jump එකක් නම් දුර එකතු නොකර baseline එක අලුත් කරන්න.
-                    if (!Number.isFinite(distKM) || distKM > 0.5) {
-                        lastPosition = currentCoords;
-                        document.getElementById('trip-status-text').innerText =
-                            'GPS ස්ථානය නැවත සකසමින්...';
+                    // අසාමාන්‍ය GPS jump එකක් හෝ භෞතිකව කළ නොහැකි වේගයක් දුරට එකතු නොකරන්න.
+                    const maxPlausibleM = Math.max(35, elapsedSec * 45);
+                    if (!Number.isFinite(distM) || distM > maxPlausibleM) {
+                        lastPosition = current;
+                        document.getElementById('trip-status-text').innerText = 'GPS ස්ථානය නැවත තහවුරු කරමින්...';
                         return;
                     }
 
-                    // speed අගය Android/iOS වල null හෝ 0 විය හැකි නිසා speed එකෙන් reading අවහිර නොකරන්න.
-                    // ඊළඟ reading එකට පෙර baseline එක සෑම විටම යාවත්කාලීන කරන්න.
-                    lastPosition = currentCoords;
+                    // සෑම reading එකකදීම baseline එක update කරන්න; එහෙත් GPS jitter එක දුරට එකතු නොකරන්න.
+                    const noiseFloorM = Math.max(5, Math.min(12, (lastPosition.accuracy + current.accuracy) * 0.35));
+                    lastPosition = current;
+                    if (distM < noiseFloorM) return;
 
-                    // GPS noise අඩු කිරීමට 3m ට අඩු වෙනස්කම් එකතු නොකරයි.
-                    if (distKM >= 0.003) {
-                        totalTripKM += distKM;
-                        document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
+                    totalTripKM += distKM;
+                    document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
 
-                        const fuelNeeded = mileage > 0 ? totalTripKM / mileage : 0;
-                        const tempFuel = Math.max(0, currentFuel - fuelNeeded);
-                        if (tempFuel <= 1.0 && !alertShownForThisLowFuel) showLowFuelModal(tempFuel);
-                    }
+                    const fuelNeeded = mileage > 0 ? totalTripKM / mileage : 0;
+                    const tempFuel = Math.max(0, currentFuel - fuelNeeded);
+                    if (tempFuel <= 1.0 && !alertShownForThisLowFuel) showLowFuelModal(tempFuel);
                 },
                 (error) => {
                     let message = 'GPS දෝෂයක් ඇතිවිය.';
@@ -928,11 +923,7 @@
                     document.getElementById('trip-status-text').innerText = message;
                     console.warn('SMART MEETER geolocation error:', error.code, error.message);
                 },
-                {
-                    enableHighAccuracy: true,
-                    maximumAge: 1000,
-                    timeout: 20000
-                }
+                { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
             );
         }
 
