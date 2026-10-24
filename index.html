@@ -841,6 +841,7 @@
         }
 
         // SMART FILTER & WAKE LOCK GPS TRIP START
+        // SMART FILTER & WAKE LOCK GPS TRIP START (Fixed for Android & Fake Location)
         async function startLiveTrip() {
             if (!navigator.geolocation) { alert("GPS සඳහා සහය නොදක්වයි!"); return; }
 
@@ -867,22 +868,21 @@
                         speed: position.coords.speed        
                     };
                     
-                    if (currentCoords.accuracy > 30) {
-                        return; 
-                    }
-
-                    if (currentCoords.speed !== null && currentCoords.speed < 0.8) {
+                    // ඇන්ඩ්‍රොයිඩ් සහ ෆේක් ලොකේෂන් සඳහා Accuracy සීමාව මඳක් ලිහිල් කළෙමු (මීටර් 100 දක්වා)
+                    if (currentCoords.accuracy > 100) {
                         return; 
                     }
 
                     if (lastPosition) {
                         const distKM = calculateDistance(lastPosition.lat, lastPosition.lng, currentCoords.lat, currentCoords.lng);
                         
-                        if (distKM > 0.1) {
+                        // GPS පැනීම් (Jumps) වැළැක්වීම: එකවර කි.මී. 2කට වඩා වැඩි පිම්මක් පැනේ නම් එය මඟහරියි
+                        if (distKM > 2.0) {
                             return; 
                         }
 
-                        if (distKM > 0.015) {
+                        // අවම දුර සීමාව: මීටර් 2.5ක් (0.0025 KM) හෝ ከዚያ වැඩි දුරක් චලනය වුවහොත් මීටරය ඉදිරියට යයි
+                        if (distKM >= 0.0025) {
                             totalTripKM += distKM;
                             document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
                             
@@ -896,8 +896,8 @@
                         lastPosition = currentCoords;
                     }
                 },
-                (error) => { console.log("GPS සංඥා අපේක්ෂා කරයි..."); },
-                { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                (error) => { console.log("GPS සංඥා අපේක්ෂා කරයි...", error); },
+                { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
             );
         }
 
