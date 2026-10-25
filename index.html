@@ -928,12 +928,24 @@
                         return;
                     }
 
-                    // සෑම reading එකකදීම baseline එක update කරන්න; එහෙත් GPS jitter එක දුරට එකතු නොකරන්න.
-                    const noiseFloorM = Math.max(5, Math.min(12, (lastPosition.accuracy + current.accuracy) * 0.35));
-                    lastPosition = current;
+                    // කුඩා GPS වෙනස්කම් වහාම ඉවත නොදමන්න:
+                    // baseline එක තබාගෙන දුර එකතු වන තුරු බලා සිටීමෙන් හෙමින් යන දුරත් ගණනය වේ.
+                    // Accuracy අනුව 3m–6m අතර threshold එකක් භාවිතා කර stationary GPS jitter අඩු කරයි.
+                    const noiseFloorM = Math.max(3, Math.min(6, (lastPosition.accuracy + current.accuracy) * 0.25));
+
+                    // GPS එකේ speed පැහැදිලිව 0ට ආසන්න නම්, ස්ථානයේ කුඩා jitter එක දුරට එකතු නොකරයි.
+                    if (current.speed !== null && Number.isFinite(current.speed) &&
+                        current.speed < 0.4 && distM < 8) {
+                        lastPosition = current;
+                        return;
+                    }
+
+                    // threshold එකට අඩු movement එකකදී baseline එක update නොකරන්න.
+                    // එවිට ඊළඟ readings සමඟ සැබෑ කුඩා ගමනේ දුර එකතු වී threshold එක ඉක්මවූ විට ගණනය වේ.
                     if (distM < noiseFloorM) return;
 
                     totalTripKM += distKM;
+                    lastPosition = current;
                     document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
 
                     const fuelNeeded = mileage > 0 ? totalTripKM / mileage : 0;
