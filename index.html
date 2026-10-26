@@ -71,6 +71,52 @@
             0%, 100% { box-shadow: 0 0 15px rgba(0, 245, 212, 0.2); }
             50% { box-shadow: 0 0 30px rgba(0, 245, 212, 0.45); }
         }
+
+        /* Premium digital trip meter */
+        .trip-meter-card { position:relative; overflow:hidden; background:linear-gradient(145deg,#071525 0%,#06101e 48%,#0b2230 100%); border:1px solid rgba(34,211,238,.32); box-shadow:0 18px 45px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.06); }
+        .trip-meter-card::before { content:""; position:absolute; inset:-40% -20%; background:radial-gradient(ellipse at 50% 45%,rgba(6,182,212,.17),transparent 58%); pointer-events:none; }
+        .trip-meter-card::after { content:""; position:absolute; left:0; right:0; top:0; height:2px; background:linear-gradient(90deg,transparent,#22d3ee,#34d399,transparent); opacity:.9; }
+        .trip-meter-screen { position:relative; overflow:hidden; border:1px solid rgba(45,212,191,.26); border-radius:24px; padding:20px 12px 17px; background:linear-gradient(180deg,rgba(1,8,17,.96),rgba(5,25,35,.92)); box-shadow:inset 0 0 35px rgba(6,182,212,.09),0 0 24px rgba(6,182,212,.06); }
+        .trip-meter-screen::before { content:""; position:absolute; inset:0; opacity:.14; pointer-events:none; background:repeating-linear-gradient(0deg,transparent 0px,transparent 4px,rgba(34,211,238,.22) 5px); }
+        .trip-meter-value { position:relative; display:block; font-family:'Courier New',monospace; font-size:clamp(2.5rem,11vw,4.15rem); line-height:1.05; font-weight:900; letter-spacing:.035em; color:#a7f3d0; text-shadow:0 0 8px rgba(52,211,153,.55),0 0 24px rgba(34,211,238,.25); font-variant-numeric:tabular-nums; white-space:nowrap; }
+        .trip-meter-unit { position:relative; color:#67e8f9; font-size:.7rem; font-weight:900; letter-spacing:.28em; text-transform:uppercase; }
+        .trip-meter-chip { display:inline-flex; align-items:center; gap:7px; border:1px solid rgba(34,211,238,.25); border-radius:999px; padding:6px 11px; background:rgba(8,145,178,.10); color:#a5f3fc; font-size:10px; font-weight:900; letter-spacing:.08em; }
+        .trip-meter-dot { width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399; }
+        .light .trip-meter-card { background:linear-gradient(145deg,#f0fdff,#e6fffb 70%,#f8fafc); border-color:rgba(8,145,178,.28); }
+        .light .trip-meter-screen { background:linear-gradient(180deg,#f8ffff,#e9fffb); }
+        .light .trip-meter-value { color:#047857; text-shadow:0 0 1px rgba(4,120,87,.25); }
+        .light .trip-meter-unit { color:#0e7490; }
+        .light .trip-meter-chip { color:#0e7490; background:rgba(8,145,178,.07); }
+        @media (prefers-reduced-motion:no-preference) { .trip-meter-dot { animation:meterDot 1.8s infinite; } }
+        @keyframes meterDot { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+        /* SMART MEETER premium redesign: clean instrument-cluster style */
+        body.tech-bg { background: radial-gradient(ellipse at 50% -10%, #173047 0%, #08111f 42%, #050a12 100%) !important; background-attachment: fixed !important; }
+        body.tech-bg::before { background: radial-gradient(circle at 15% 15%, rgba(20,184,166,.10), transparent 32%), radial-gradient(circle at 90% 35%, rgba(59,130,246,.09), transparent 30%) !important; animation:none !important; }
+        header.app-glass { background:rgba(6,13,24,.92)!important; border-color:rgba(148,163,184,.14)!important; box-shadow:0 8px 28px rgba(0,0,0,.22)!important; backdrop-filter:blur(18px); }
+        .app-glass { background:rgba(12,22,37,.88)!important; border:1px solid rgba(148,163,184,.16)!important; box-shadow:0 12px 32px rgba(0,0,0,.16); }
+        .trip-meter-card { padding:clamp(18px,4vw,30px)!important; border:1px solid rgba(45,212,191,.30)!important; border-radius:30px!important; background:linear-gradient(145deg,#101e2e 0%,#0b1725 60%,#0b2028 100%)!important; box-shadow:0 24px 65px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.06)!important; }
+        .trip-meter-card::before { inset:0!important; background:radial-gradient(ellipse at 50% 0%,rgba(20,184,166,.14),transparent 58%)!important; }
+        .trip-meter-card::after { height:3px!important; background:linear-gradient(90deg,transparent,#2dd4bf 20%,#60a5fa 50%,#2dd4bf 80%,transparent)!important; }
+        .trip-meter-screen { border-radius:25px!important; padding:clamp(22px,6vw,36px) 10px 24px!important; border:1px solid rgba(45,212,191,.22)!important; background:linear-gradient(180deg,#030a12,#071722)!important; box-shadow:inset 0 0 40px rgba(20,184,166,.07),0 10px 25px rgba(0,0,0,.22)!important; }
+        .trip-meter-screen::before { opacity:.045!important; background:repeating-linear-gradient(0deg,transparent 0,transparent 5px,rgba(255,255,255,.4) 6px)!important; }
+        .trip-meter-value { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace!important; font-size:clamp(2.65rem,12vw,5.2rem)!important; letter-spacing:-.055em!important; line-height:1.12!important; color:#b8ffe7!important; text-shadow:0 0 22px rgba(52,211,153,.18)!important; }
+        .trip-meter-unit { letter-spacing:.32em!important; font-size:.68rem!important; color:#6ee7d2!important; }
+        .trip-meter-chip { background:rgba(16,185,129,.09)!important; border-color:rgba(52,211,153,.25)!important; color:#a7f3d0!important; padding:7px 12px!important; }
+        .trip-meter-card button { min-height:54px; border-radius:17px!important; font-size:13px!important; letter-spacing:.01em; box-shadow:0 8px 20px rgba(0,0,0,.18)!important; }
+        .trip-meter-card button:first-child:not(.hidden) { background:linear-gradient(135deg,#6ee7b7,#2dd4bf)!important; }
+        .trip-meter-card button:active { transform:scale(.975); }
+        .trip-meter-card h3 { letter-spacing:-.025em; }
+        .rounded-3xl, .rounded-2xl { transition:border-color .2s ease, box-shadow .2s ease; }
+        button { cursor:pointer; }
+        input, select, textarea { border-radius:14px!important; }
+        .tab-content .app-glass { border-radius:24px!important; }
+        .light body, .light body.tech-bg { background:#f1f7f9!important; }
+        .light .trip-meter-card { background:linear-gradient(145deg,#ffffff,#edfafa)!important; border-color:rgba(13,148,136,.24)!important; box-shadow:0 18px 45px rgba(15,23,42,.10)!important; }
+        .light .trip-meter-screen { background:linear-gradient(180deg,#f8ffff,#eaf9f7)!important; }
+        .light .trip-meter-value { color:#047857!important; text-shadow:none!important; }
+        @media(max-width:380px) { .trip-meter-card { padding:15px!important; } .trip-meter-value { font-size:clamp(2.35rem,11vw,3.2rem)!important; } .trip-meter-screen { padding:20px 5px!important; } }
+        @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
     </style>
 </head>
 <body class="tech-bg text-slate-100 light:text-slate-900 min-h-screen selection:bg-brand-500 selection:text-slate-950 transition-colors duration-500">
@@ -292,31 +338,44 @@
                 </div>
             </div>
 
-            <!-- LIVE GPS TRIP CONTROLS -->
-            <div class="app-glass rounded-3xl p-6 shadow-2xl space-y-4 text-center border border-slate-800 light:border-slate-200">
-                <div class="w-14 h-14 bg-cyan-500/10 text-cyan-400 rounded-2xl flex items-center justify-center mx-auto text-2xl border border-cyan-500/20">
-                    <i class="fa-solid fa-satellite-dish animate-spin" style="animation-duration: 6s;"></i>
-                </div>
-                <div>
-                    <h3 class="text-lg font-black text-cyan-400">සජීවී ජීපීඑස් මීටරය</h3>
-                    <p class="text-[11px] text-slate-400 font-bold mt-0.5">ගමන අරඹන විට Start Trip ඔබන්න</p>
+            <!-- PREMIUM DIGITAL GPS TRIP METER -->
+            <div class="trip-meter-card rounded-[2rem] p-5 sm:p-6 shadow-2xl space-y-5 text-center">
+                <div class="relative flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 text-left">
+                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-cyan-300 text-xl border border-cyan-300/20 bg-cyan-400/10 shadow-lg shadow-cyan-950/30">
+                            <i class="fa-solid fa-gauge-high"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-black text-cyan-300 light:text-cyan-800">සජීවී ඩිජිටල් මීටරය</h3>
+                            <p class="text-[10px] sm:text-[11px] text-slate-400 light:text-slate-600 font-bold mt-1">GPS TRIP DISTANCE</p>
+                        </div>
+                    </div>
+                    <span class="trip-meter-chip"><span class="trip-meter-dot"></span> LIVE</span>
                 </div>
 
-                <div class="bg-slate-950/50 light:bg-slate-100 p-4 rounded-2xl border border-slate-800 light:border-slate-200">
-                    <span class="text-[10px] font-black text-slate-400 block mb-1 uppercase tracking-widest">ගමන් කළ දුර (Live KM)</span>
-                    <span id="live-km-val" class="text-3xl font-black text-white light:text-slate-900 tracking-tight">0.00 KM</span>
-                    <div id="trip-status-text" class="text-xs font-black text-brand-500 mt-2">සූදානම් තත්වයේ ඇත</div>
+                <div class="trip-meter-screen">
+                    <div class="relative flex justify-center items-center gap-2 mb-3 text-cyan-200/70">
+                        <i class="fa-solid fa-location-crosshairs text-xs"></i>
+                        <span class="text-[9px] font-black tracking-[.24em] uppercase">Distance travelled</span>
+                    </div>
+                    <span id="live-km-val" class="trip-meter-value">0.00 KM</span>
+                    <div class="relative mt-3 flex justify-center"><span class="trip-meter-unit">KILOMETERS</span></div>
+                    <div class="relative mt-5 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent"></div>
+                    <div class="relative flex items-center justify-center gap-2 mt-3 text-[10px] font-bold text-slate-400 light:text-slate-600">
+                        <i class="fa-solid fa-satellite-dish text-cyan-400"></i>
+                        <span id="trip-status-text" class="text-emerald-300 light:text-emerald-700">සූදානම් තත්වයේ ඇත</span>
+                    </div>
                 </div>
 
-                <button id="start-trip-btn" onclick="startLiveTrip()" class="w-full bg-gradient-to-r from-emerald-500 to-brand-500 text-slate-950 font-black py-4 rounded-2xl text-base shadow-lg flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-play"></i>
-                    <span>ගමන ආරම්භ කරන්න (Start Trip)</span>
-                </button>
-
-                <button id="end-trip-btn" onclick="endLiveTrip()" class="hidden w-full bg-gradient-to-r from-red-500 to-rose-600 text-white font-black py-4 rounded-2xl text-base shadow-lg animate-pulse flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-stop"></i>
-                    <span>ගමන අවසන් කරන්න (End Trip)</span>
-                </button>
+                <div class="relative grid grid-cols-2 gap-3">
+                    <button id="start-trip-btn" onclick="startLiveTrip()" class="w-full bg-gradient-to-r from-emerald-400 to-teal-300 text-slate-950 font-black py-4 px-2 rounded-2xl text-sm shadow-lg shadow-emerald-950/30 transition active:scale-[.98] flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i><span>ගමන අරඹන්න</span>
+                    </button>
+                    <button id="end-trip-btn" onclick="endLiveTrip()" class="hidden w-full bg-gradient-to-r from-red-500 to-rose-600 text-white font-black py-4 px-2 rounded-2xl text-sm shadow-lg transition active:scale-[.98] flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-stop"></i><span>ගමන නවත්වන්න</span>
+                    </button>
+                    <div class="col-span-2 text-[9px] font-bold text-slate-500 light:text-slate-600">ගමන ආරම්භ කිරීමට පෙර GPS Location ON කරන්න</div>
+                </div>
             </div>
 
         </div>
@@ -328,10 +387,33 @@
                     <i class="fa-solid fa-gas-pump"></i>
                     <span>තෙල් ගැසීමක් ඇතුළත් කරන්න</span>
                 </h3>
+                <div class="rounded-2xl border border-brand-500/30 bg-brand-500/5 p-4 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-brand-500/15 text-brand-500 flex items-center justify-center text-xl"><i class="fa-solid fa-camera"></i></div>
+                        <div class="flex-1">
+                            <div class="text-sm font-black">පොම්පයේ L අගය Photo එකෙන් කියවන්න</div>
+                            <p class="text-xs text-slate-400 mt-1">පෙට්‍රල් පොම්පයේ ලීටර් display එකේ පැහැදිලි photo එකක් ගන්න.</p>
+                        </div>
+                    </div>
+                    <input id="pump-photo-input" type="file" accept="image/*" capture="environment" class="hidden" onchange="readPumpPhoto(event)">
+                    <div id="pump-camera-wrap" class="hidden space-y-3">
+                        <video id="pump-camera-video" autoplay playsinline muted class="w-full max-h-72 rounded-xl bg-black object-contain"></video>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="capturePumpPhoto()" class="bg-brand-500 text-slate-950 font-black py-3 rounded-xl text-sm"><i class="fa-solid fa-camera mr-2"></i> Photo ගන්න</button>
+                            <button type="button" onclick="closePumpCamera()" class="bg-slate-700 text-white font-bold py-3 rounded-xl text-sm">කැමරාව වසන්න</button>
+                        </div>
+                    </div>
+                    <canvas id="pump-camera-canvas" class="hidden"></canvas>
+                    <button id="pump-camera-open" type="button" onclick="openPumpCamera()" class="w-full bg-slate-800 light:bg-slate-200 border border-slate-700 light:border-slate-300 text-white light:text-slate-900 font-black py-3 rounded-xl text-sm"><i class="fa-solid fa-camera mr-2"></i> කැමරාව විවෘත කරන්න</button>
+                    <button type="button" onclick="document.getElementById('pump-photo-input').click()" class="w-full text-slate-400 border border-slate-700/70 font-bold py-2.5 rounded-xl text-xs"><i class="fa-regular fa-image mr-2"></i> Gallery එකෙන් Photo එකක් තෝරන්න</button>
+                    <img id="pump-photo-preview" class="hidden w-full max-h-56 object-contain rounded-xl bg-black/20" alt="Fuel pump display preview">
+                    <div id="pump-ocr-status" class="text-xs text-slate-400" aria-live="polite">Photo එකෙන් L ගණන කියවීමට සූදානම්.</div>
+                    <p class="text-[10px] text-amber-400">සටහන: OCR කියවීම වැරදි විය හැක. එකතු කිරීමට පෙර L අගය පරීක්ෂා කරන්න.</p>
+                </div>
                 <div class="space-y-3.5">
                     <div>
-                        <label class="block text-[10px] uppercase font-black text-slate-400 mb-1.5">පෙට්‍රල් ලීටර් ගණන</label>
-                        <input type="number" id="refuel-liters" step="0.1" placeholder="උදා: 3.5" class="w-full bg-slate-900 light:bg-slate-100 border border-slate-700 light:border-slate-300 rounded-2xl p-3.5 text-sm font-black focus:outline-none">
+                        <label class="block text-[10px] uppercase font-black text-slate-400 mb-1.5">පෙට්‍රල් ලීටර් ගණන (Photo එකෙන් auto-fill වේ)</label>
+                        <input type="number" id="refuel-liters" step="0.01" min="0.01" placeholder="Photo එකෙන් හඳුනාගත් L ගණන" class="w-full bg-slate-900 light:bg-slate-100 border border-slate-700 light:border-slate-300 rounded-2xl p-3.5 text-sm font-black focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-[10px] uppercase font-black text-slate-400 mb-1.5">ගෙවූ මුදල (LKR)</label>
@@ -824,6 +906,127 @@
             document.getElementById('manual-preview-box').classList.add('hidden');
         }
 
+        let pumpCameraStream = null;
+
+        async function openPumpCamera() {
+            const status = document.getElementById('pump-ocr-status');
+            const wrap = document.getElementById('pump-camera-wrap');
+            const video = document.getElementById('pump-camera-video');
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                status.textContent = 'මෙම browser එකේ direct camera පහසුකම නැහැ. HTTPS website එකෙන් විවෘත කර Chrome permission ලබාදී නැවත උත්සාහ කරන්න.';
+                document.getElementById('pump-photo-input').click();
+                return;
+            }
+            try {
+                closePumpCamera();
+                pumpCameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+                video.srcObject = pumpCameraStream;
+                wrap.classList.remove('hidden');
+                document.getElementById('pump-camera-open').classList.add('hidden');
+                status.textContent = 'කැමරාව සූදානම්. පොම්පයේ L ගණන පැහැදිලිව frame එකට ගෙන Photo ගන්න.';
+                await video.play();
+            } catch (err) {
+                console.error(err);
+                status.textContent = 'කැමරාව විවෘත කළ නොහැක. Website එක HTTPS ද යන්නත්, Chrome camera permission Allow කර ඇතිද යන්නත් පරීක්ෂා කරන්න.';
+                wrap.classList.add('hidden');
+                document.getElementById('pump-camera-open').classList.remove('hidden');
+            }
+        }
+
+        function closePumpCamera() {
+            if (pumpCameraStream) {
+                pumpCameraStream.getTracks().forEach(track => track.stop());
+                pumpCameraStream = null;
+            }
+            const video = document.getElementById('pump-camera-video');
+            if (video) video.srcObject = null;
+            const wrap = document.getElementById('pump-camera-wrap');
+            if (wrap) wrap.classList.add('hidden');
+            const openBtn = document.getElementById('pump-camera-open');
+            if (openBtn) openBtn.classList.remove('hidden');
+        }
+
+        function capturePumpPhoto() {
+            const video = document.getElementById('pump-camera-video');
+            const canvas = document.getElementById('pump-camera-canvas');
+            const status = document.getElementById('pump-ocr-status');
+            if (!video.videoWidth || !video.videoHeight) {
+                status.textContent = 'කැමරාව සූදානම් වනතුරු තත්පරයක් රැඳී සිටින්න.';
+                return;
+            }
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => {
+                if (!blob) {
+                    status.textContent = 'Photo එක ගන්න බැරි වුණා. නැවත උත්සාහ කරන්න.';
+                    return;
+                }
+                const file = new File([blob], 'fuel-pump-photo.jpg', { type: 'image/jpeg' });
+                closePumpCamera();
+                readPumpPhoto({ target: { files: [file] } });
+            }, 'image/jpeg', 0.92);
+        }
+
+        let pumpOcrBusy = false;
+        async function readPumpPhoto(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file || pumpOcrBusy) return;
+            pumpOcrBusy = true;
+            const status = document.getElementById('pump-ocr-status');
+            const preview = document.getElementById('pump-photo-preview');
+            preview.src = URL.createObjectURL(file);
+            preview.classList.remove('hidden');
+            let worker = null;
+            const setStatus = (message) => { status.textContent = message; };
+            const timeout = (promise, ms, message) => Promise.race([
+                promise,
+                new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms))
+            ]);
+            try {
+                setStatus('Photo එක ලැබුණා. OCR engine එක පරීක්ෂා කරමින්...');
+                if (!window.Tesseract) {
+                    await timeout(new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+                        script.onload = resolve;
+                        script.onerror = () => reject(new Error('OCR script එක download වුණේ නැහැ.'));
+                        document.head.appendChild(script);
+                    }), 20000, 'OCR script එක load වීමට වැඩි කාලයක් ගියා.');
+                }
+                if (!window.Tesseract) throw new Error('OCR engine එක ආරම්භ වුණේ නැහැ.');
+                setStatus('OCR engine එක ආරම්භ කරමින්... Internet connection එක අනුව තත්පර 10–60ක් ගත විය හැක.');
+                worker = await timeout(Tesseract.createWorker('eng', 1, {
+                    workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
+                    corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js',
+                    langPath: 'https://tessdata.projectnaptha.com/4.0.0',
+                    logger: m => {
+                        if (m.status === 'loading tesseract core') setStatus('OCR engine එක load වෙමින්...');
+                        else if (m.status === 'loading language traineddata') setStatus('English number reader එක download වෙමින්...');
+                        else if (m.status === 'initializing api') setStatus('OCR සූදානම් කරමින්...');
+                        else if (m.status === 'recognizing text') setStatus(`Photo එක කියවමින්... ${Math.round((m.progress || 0) * 100)}%`);
+                    }
+                }), 60000, 'OCR engine එක ආරම්භ වීමට වැඩි කාලයක් ගියා. Internet/CDN සම්බන්ධතාවය පරීක්ෂා කරන්න.');
+                const result = await timeout(worker.recognize(file), 60000, 'Photo එක කියවීමට වැඩි කාලයක් ගියා. Display එකට ළඟින් පැහැදිලි photo එකක් ගෙන නැවත උත්සාහ කරන්න.');
+                const raw = (result.data.text || '').replace(/,/g, '.');
+                const matches = raw.match(/\d+(?:\.\d{1,3})?/g) || [];
+                const nums = matches.map(v => Number(v)).filter(v => Number.isFinite(v) && v > 0 && v <= 1000);
+                if (!nums.length) {
+                    setStatus('L ගණන හඳුනාගන්න බැරි වුණා. Display එකට ළඟින්, පැහැදිලි photo එකක් ගන්න.');
+                    return;
+                }
+                const litersGuess = nums.find(v => v <= 100) ?? nums[0];
+                document.getElementById('refuel-liters').value = litersGuess.toFixed(2).replace(/\.?0+$/, '');
+                setStatus(`හඳුනාගත් අගය: ${litersGuess} L. පොම්පයේ L අගය සමඟ සසඳා තහවුරු කරන්න. OCR කියවීම: ${raw.trim().slice(0, 100)}`);
+            } catch (err) {
+                console.error(err);
+                setStatus((err && err.message) ? `Photo කියවීම අසාර්ථකයි: ${err.message} කරුණාකර Internet පරීක්ෂා කර නැවත උත්සාහ කරන්න, නැත්නම් L අගය අතින් ඇතුළත් කරන්න.` : 'Photo කියවීම අසාර්ථකයි. L අගය අතින් ඇතුළත් කරන්න.');
+            } finally {
+                if (worker) { try { await worker.terminate(); } catch (_) {} }
+                pumpOcrBusy = false;
+            }
+        }
+
         function submitRefuel() {
             const liters = parseFloat(document.getElementById('refuel-liters').value);
             const cost = parseFloat(document.getElementById('refuel-cost').value);
@@ -903,16 +1106,15 @@
                         time: position.timestamp || Date.now()
                     };
 
-                    // GPS accuracy දුර්වල නම් ඒ reading එකෙන් දුර එකතු නොකරන්න.
-                    // Phone GPS එකෙන් ලැබෙන ± accuracy අගය 25m ඉක්මවූ විට noise වැඩියි.
-                    if (current.accuracy > 25) {
+                    // Indoor/weak fixes are ignored, but allow ordinary outdoor phone GPS variation.
+                    if (current.accuracy > 35) {
                         document.getElementById('trip-status-text').innerText =
                             `GPS සංඥාව දුර්වලයි (±${Math.round(current.accuracy)}m). එළිමහන් ස්ථානයක සිටින්න.`;
                         return;
                     }
 
                     document.getElementById('trip-status-text').innerText =
-                        `GPS සම්බන්ධයි (±${Math.round(current.accuracy)}m). ගමන ගණනය කරමින්...`;
+                        `GPS සම්බන්ධයි (±${Math.round(current.accuracy)}m). හෙමින් ගමනත් ගණනය කරමින්...`;
 
                     if (!lastPosition) {
                         lastPosition = current;
@@ -932,60 +1134,61 @@
                         return;
                     }
 
-                    // Stationary GPS drift suppress කරන්න 12m ට අඩු වෙනස්වීම්
-                    // මත දුර එකතු නොකරයි. Accuracy දුර්වල වන විට threshold වැඩි වේ.
-                    const movementThresholdM = Math.max(
-                        12,
-                        Math.min(18, (lastPosition.accuracy + current.accuracy) * 0.40)
-                    );
-
-                    // Device speed අඩු බව වාර්තා කරන්නේ නම්, කුඩා GPS drift එකක් ignore කරන්න.
-                    if (current.speed !== null && current.speed < 0.6 && distM < 15) {
-                        pendingGPSPositions = [];
-                        return;
-                    }
+                    // Keep the original anchor while movement is uncertain. Use net displacement
+                    // from the anchor (not every GPS zig-zag) so stationary drift does not add up.
+                    const reportedMoving = current.speed !== null && current.speed >= 0.7;
+                    const accuracyThreshold = (lastPosition.accuracy + current.accuracy) * 0.20;
+                    // Stronger stationary-drift filter: phone GPS may wander several metres
+                    // even when the vehicle is parked. Keep the threshold modest for real
+                    // movement reported by GPS, but require a larger net displacement otherwise.
+                    const movementThresholdM = reportedMoving
+                        ? Math.max(3.0, Math.min(5.0, accuracyThreshold))
+                        : Math.max(10.0, Math.min(14.0, accuracyThreshold));
 
                     if (distM < movementThresholdM) {
-                        // Anchor එක වෙනස් නොකරන්න; එවිට සැබෑ හෙමින් ගමනේ දුර එකතු වී තහවුරු වේ.
+                        // Keep a short history for slow movement; don't move the anchor on GPS jitter.
                         pendingGPSPositions.push(current);
-                        if (pendingGPSPositions.length > 4) pendingGPSPositions.shift();
+                        if (pendingGPSPositions.length > 6) pendingGPSPositions.shift();
                         return;
                     }
 
-                    // Anchor එකෙන් threshold ඉක්මවා ගිය පළමු reading එක පමණක් ප්‍රමාණවත් නොවේ.
-                    // ඊළඟ reading එකත් එම ප්‍රදේශයේ සිට anchor එකෙන් දුරස්ව තිබේ නම් movement තහවුරු වේ.
-                    const previousCandidate = pendingGPSPositions.length
-                        ? pendingGPSPositions[pendingGPSPositions.length - 1]
-                        : null;
+                    pendingGPSPositions.push(current);
+                    if (pendingGPSPositions.length > 6) pendingGPSPositions.shift();
 
-                    if (!previousCandidate) {
-                        pendingGPSPositions.push(current);
-                        if (pendingGPSPositions.length > 4) pendingGPSPositions.shift();
-                        return;
+                    // Require repeated fixes that agree on real net movement. When GPS speed
+                    // is unavailable/near zero, use four recent fixes and stronger consistency
+                    // checks so random stationary wandering is less likely to add distance.
+                    const candidateDistances = pendingGPSPositions.map(p =>
+                        calculateDistance(lastPosition.lat, lastPosition.lng, p.lat, p.lng) * 1000
+                    );
+                    const meaningful = candidateDistances.filter(d => d >= movementThresholdM);
+                    const requiredFixes = reportedMoving ? 3 : 4;
+                    if (meaningful.length < requiredFixes) return;
+
+                    const recent = pendingGPSPositions.slice(reportedMoving ? -3 : -4);
+                    const recentDistances = recent.map(p =>
+                        calculateDistance(lastPosition.lat, lastPosition.lng, p.lat, p.lng) * 1000
+                    );
+                    let progressing;
+                    if (reportedMoving) {
+                        progressing = recentDistances.length === 3 &&
+                            recentDistances[2] >= movementThresholdM &&
+                            recentDistances[1] >= movementThresholdM * 0.70 &&
+                            recentDistances[2] >= recentDistances[0] * 0.80;
+                    } else {
+                        const aboveThreshold = recentDistances.filter(d => d >= movementThresholdM).length;
+                        const endDistance = recentDistances[recentDistances.length - 1];
+                        const startDistance = recentDistances[0];
+                        progressing = recentDistances.length === 4 && aboveThreshold >= 3 &&
+                            endDistance >= movementThresholdM &&
+                            endDistance >= startDistance * 0.90 &&
+                            Math.max(...recentDistances) - Math.min(...recentDistances) >= 2.0;
                     }
+                    if (!progressing) return;
 
-                    const previousCandidateDistM = calculateDistance(
-                        lastPosition.lat, lastPosition.lng,
-                        previousCandidate.lat, previousCandidate.lng
-                    ) * 1000;
-                    const candidateToCurrentM = calculateDistance(
-                        previousCandidate.lat, previousCandidate.lng,
-                        current.lat, current.lng
-                    ) * 1000;
-
-                    const movementConfirmed =
-                        previousCandidateDistM >= movementThresholdM * 0.90 &&
-                        distM >= previousCandidateDistM * 0.85 &&
-                        candidateToCurrentM <= Math.max(8, movementThresholdM * 0.65);
-
-                    if (!movementConfirmed) {
-                        pendingGPSPositions.push(current);
-                        if (pendingGPSPositions.length > 4) pendingGPSPositions.shift();
-                        return;
-                    }
-
-                    // සනාථ කළ net displacement පමණක් එකතු කිරීමෙන් stationary drift/path zig-zag අඩු වේ.
-                    totalTripKM += distKM;
+                    // Add only confirmed net displacement, not noisy point-to-point zig-zags.
+                    const confirmedDistanceM = distM;
+                    totalTripKM += confirmedDistanceM / 1000;
                     lastPosition = current;
                     pendingGPSPositions = [];
                     document.getElementById('live-km-val').innerText = `${totalTripKM.toFixed(2)} KM`;
